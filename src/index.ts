@@ -71,13 +71,19 @@ async function run(): Promise<void> {
     console.log("Connecting to Browsercat...");
     const page = await bc.connect();
 
-    console.log("Waiting until exactly 2:00 PM...");
-    await waitUntil2PM();
+    const testMode = process.env.TEST_MODE === "true";
+    
+    if (testMode) {
+      console.log("⚡ TEST_MODE enabled - running immediately");
+    } else {
+      console.log("Waiting until exactly 2:00 PM...");
+      await waitUntil2PM();
+    }
 
     const reserve = new CourtReserve(page, {
       email,
       password,
-      testMode: process.env.TEST_MODE === "true",
+      testMode,
     });
 
     console.log("Logging in...");
