@@ -8,7 +8,8 @@
     "reserve": "tsx src/index.ts",
     "reserve:prod": "npm run build && node dist/index.js",
     "dev": "PLAYWRIGHT_LOCAL=true TEST_MODE=true HEADED=true tsx src/index.ts",
-    "debug": "PLAYWRIGHT_LOCAL=true TEST_MODE=true PWDEBUG=1 tsx src/index.ts"
+    "debug": "PLAYWRIGHT_LOCAL=true TEST_MODE=true PWDEBUG=1 tsx src/index.ts",
+    "codegen": "npx playwright codegen https://app.playbypoint.com/book/ipicklewhittiernarrows?skip_waivers=true"
   },
   "author": "julian t",
   "license": "ISC",

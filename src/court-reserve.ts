@@ -26,17 +26,17 @@ export class CourtReserve {
     if (this.testMode) {
       // Test mode: easier times and court for testing
       this.config = {
-        courtName: "Court 1",
-        timeSlots: ["2-2:30pm", "2:30-3pm", "3-3:30pm", "3:30-4pm"],
+        courtName: "PB Court 1",
+        timeSlots: ["-2:30pm", ":30-3pm", "-3:30pm", ":30-4pm"],
       };
-      console.log("🧪 Test mode: Court 1, afternoon times (2:00-4:00 PM)");
+      console.log("🧪 Test mode: PB Court 1, afternoon times (2:00-4:00 PM)");
     } else {
       // Production mode: prime evening slots
       this.config = {
-        courtName: "Court 25",
-        timeSlots: ["7-7:30pm", "7:30-8pm", "8-8:30pm", "8:30-9pm"],
+        courtName: "PB Court 25",
+        timeSlots: ["-7:30pm", ":30-8pm", "-8:30pm", ":30-9pm"],
       };
-      console.log("🚀 Production mode: Court 25, evening times (7:00-9:00 PM)");
+      console.log("🚀 Production mode: PB Court 25, evening times (7:00-9:00 PM)");
     }
   }
 

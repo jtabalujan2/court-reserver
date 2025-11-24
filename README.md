@@ -21,11 +21,11 @@ Automates reserving a tennis court using:
 **Note**: Court and time slots vary by mode:
 
 **Production Mode** (default):
-- Court: **Court 25**
+- Court: **PB Court 25**
 - Time slots: **7-7:30pm, 7:30-8pm, 8-8:30pm, 8:30-9pm**
 
 **Test Mode** (`TEST_MODE=true`):
-- Court: **Court 1**
+- Court: **PB Court 1**
 - Time slots: **2-2:30pm, 2:30-3pm, 3-3:30pm, 3:30-4pm**
 
 The bot tries each time slot in order until one is available.
@@ -88,14 +88,31 @@ src/
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm run reserve:prod` - Build then run compiled version
 
-### Playwright Inspector (`npm run debug`)
+### Debugging Tools
 
-The debug command opens Playwright Inspector where you can:
+**Playwright Inspector (`npm run debug`):**
 - ▶️ Step through each action one at a time
 - ⏸️ Pause and inspect the page state
-- 🔍 Hover to highlight elements
+- 🎯 **Pick Locator** button - click elements to get their locators
 - 📝 See the code execution in real-time
-- 🎯 Perfect for debugging selectors and flow
+
+**Codegen - Record Actions (`npm run codegen`):**
+- Opens browser + recorder
+- Click around the site normally (login, select court, etc.)
+- Playwright **generates the code** for you automatically
+- Shows you the **exact locators** that work
+- Copy/paste the generated code into your project
+
+**How to use codegen:**
+```bash
+npm run codegen
+
+# Then in the browser:
+# 1. Fill in email/password and click sign in
+# 2. Click "Reserve Court"
+# 3. Select date, sport, time, court
+# 4. Copy the generated locators from the Inspector
+```
 
 ## Date Selection Logic
 

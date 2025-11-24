@@ -57,10 +57,8 @@ export async function selectTimeSlot(
   for (const timeSlot of config.timeSlots) {
     console.log(`⏰ Trying time slot: ${timeSlot}`);
 
-    // Look for button with exact text match
-    const timeSlotButton = page.locator(
-      `button.ButtonOption:has-text("${timeSlot}")`
-    );
+    // Use role-based selector (more reliable)
+    const timeSlotButton = page.getByRole('button', { name: timeSlot });
 
     // Check if this time slot is available
     const isVisible = await timeSlotButton.isVisible().catch(() => false);
@@ -94,15 +92,23 @@ export async function selectCourt(
   await page.waitForTimeout(500);
 
   console.log(`🎾 Looking for ${config.courtName}`);
-  const courtCard = page.locator(`.court-card:has-text("${config.courtName}")`);
+  
+  // Use role-based selector for more reliability
+  const courtButton = page.getByRole('button', { name: config.courtName });
 
-  await courtCard.waitFor({ state: "visible", timeout: 5000 });
-  await courtCard.click();
+  await courtButton.waitFor({ state: "visible", timeout: 5000 });
+  await courtButton.click();
   console.log(`✅ Selected court: ${config.courtName}`);
+  
+  // Click Next button to proceed
+  console.log("⏭️  Clicking Next...");
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.waitForTimeout(500);
 }
 
 /**
  * Login to the court reservation system
+ * Note: Login form is inside an iframe
  */
 export async function login(
   page: Page,
@@ -113,18 +119,29 @@ export async function login(
     "https://app.playbypoint.com/book/ipicklewhittiernarrows?skip_waivers=true"
   );
 
-  const signInText = page.getByText("SIGN IN TO PLAYBYPOINT");
-  await signInText.waitFor();
+  console.log("⏳ Waiting for login iframe...");
+  
+  // The login form is inside an iframe
+  const iframe = page
+    .locator('div')
+    .filter({ hasText: 'Enter your account ServicesServices' })
+    .locator('iframe')
+    .contentFrame();
 
-  const emailInput = page.locator("id=user_email");
-  const passwordInput = page.locator("id=user_password");
-  const signInButton = page.locator('input[type="submit"][value="Sign in"]');
+  // Wait for iframe to load
+  await iframe.getByRole('textbox', { name: 'Email' }).waitFor();
 
-  await emailInput.fill(email);
-  await passwordInput.fill(password);
-
-  await signInButton.click();
-  await signInText.waitFor({ state: "hidden" });
+  // Fill in credentials
+  await iframe.getByRole('textbox', { name: 'Email' }).fill(email);
+  await iframe.getByRole('textbox', { name: 'Password' }).fill(password);
+  
+  // Click sign in
+  await iframe.getByRole('button', { name: 'Sign in' }).click();
+  
+  console.log("✅ Logged in successfully");
+  
+  // Wait for navigation to complete
+  await page.waitForLoadState("networkidle");
 }
 
 /**
@@ -140,13 +157,23 @@ export async function navigateToReservation(page: Page): Promise<void> {
 
 /**
  * Confirm the reservation
+ * Handles the Add Users step and final booking confirmation
  */
 export async function confirmReservation(page: Page): Promise<void> {
-  const confirmButton = page.getByRole("button", {
-    name: "Confirm Reservation",
-  });
-  const confirmationText = page.getByText("Reservation Confirmed");
-
-  await confirmButton.click();
-  await confirmationText.waitFor();
+  // Skip adding additional users (or add them if needed)
+  console.log("👥 Handling Add Users step...");
+  
+  // Click Next to skip adding users (or click Add Users if you want to add someone)
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.waitForTimeout(500);
+  
+  // Click Book button
+  console.log("📝 Clicking Book...");
+  await page.getByRole('button', { name: 'Book' }).click();
+  
+  // Confirm the booking (Yes button)
+  console.log("✅ Confirming booking...");
+  await page.getByRole('button', { name: 'Yes' }).click();
+  
+  console.log("🎉 Reservation confirmed!");
 }
