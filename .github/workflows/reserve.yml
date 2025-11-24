@@ -1,6 +1,8 @@
 name: Reserve Court
 
 on:
+  push:
+    branches: [master]
   schedule:
     # Monday and Wednesday at 13:57 PST (21:57 UTC)
     - cron: "57 21 * * 1,3"
