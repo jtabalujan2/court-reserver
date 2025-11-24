@@ -33,9 +33,24 @@ export class BrowsercatClient {
     } else {
       // Browsercat for production
       console.log("☁️  Connecting to Browsercat...");
-      this.browser = await chromium.connect(this.url, {
-        headers: { "Api-Key": this.apiKey },
-      });
+      try {
+        // Add timeout to prevent hanging
+        this.browser = await Promise.race([
+          chromium.connect(this.url, {
+            headers: { "Api-Key": this.apiKey },
+            timeout: 60000, // 60 second timeout
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("Browsercat connection timeout after 60s")), 60000)
+          ),
+        ]);
+        console.log("✅ Connected to Browsercat");
+      } catch (error) {
+        console.error("❌ Browsercat connection failed:", error);
+        throw new Error(
+          `Failed to connect to Browsercat: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     }
 
     this.context = await this.browser.newContext({
