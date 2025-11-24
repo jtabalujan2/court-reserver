@@ -1,4 +1,4 @@
-import { Page } from "playwright";
+import { Page, Locator, FrameLocator } from "playwright";
 
 /**
  * Page Object for the Confirmation/Booking page
@@ -7,8 +7,29 @@ import { Page } from "playwright";
 export class ConfirmationPage {
   readonly page: Page;
 
+  // Locators
+  readonly addUsersButton: Locator;
+  readonly addButton: Locator;
+  readonly nextButton: Locator;
+  readonly bookButton: Locator;
+  readonly cancelButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
+
+    // Initialize locators
+    this.addUsersButton = page.getByRole("button", { name: " Add Users" });
+    this.addButton = page.getByRole("button", { name: "Add" });
+    this.nextButton = page.getByRole("button", { name: "Next" });
+    this.bookButton = page.getByRole("button", { name: "Book" });
+    this.cancelButton = page.locator("button.ui.button.basic.black.tiny.fluid");
+  }
+
+  /**
+   * Get the confirmation iframe
+   */
+  private getConfirmationIframe(): FrameLocator {
+    return this.page.frameLocator("iframe").first();
   }
 
   /**
@@ -18,12 +39,12 @@ export class ConfirmationPage {
     console.log("👥 Adding user...");
 
     // Click "Add Users" button (note the leading space in the name)
-    await this.page.getByRole("button", { name: " Add Users" }).click();
+    await this.addUsersButton.click();
     await this.page.waitForTimeout(500);
 
     // Click the first "Add" button (there may be multiple, use nth(1) for the second one)
     console.log("   Clicking Add button...");
-    await this.page.getByRole("button", { name: "Add" }).nth(1).click();
+    await this.addButton.nth(1).click();
     await this.page.waitForTimeout(500);
 
     console.log("✅ User added");
@@ -34,7 +55,7 @@ export class ConfirmationPage {
    */
   async clickNext(): Promise<void> {
     console.log("⏭️  Clicking Next...");
-    await this.page.getByRole("button", { name: "Next" }).click();
+    await this.nextButton.click();
     await this.page.waitForTimeout(500);
   }
 
@@ -43,7 +64,7 @@ export class ConfirmationPage {
    */
   async clickBook(): Promise<void> {
     console.log("📝 Clicking Book...");
-    await this.page.getByRole("button", { name: "Book" }).click();
+    await this.bookButton.click();
   }
 
   /**
@@ -51,7 +72,12 @@ export class ConfirmationPage {
    */
   async confirmBooking(): Promise<void> {
     console.log("✅ Confirming booking...");
-    await this.page.getByRole("button", { name: "Yes" }).click();
+    
+    // Get iframe and Yes button
+    const iframe = this.getConfirmationIframe();
+    const yesButton = iframe.locator("button.ui.approve.button.green");
+    
+    await yesButton.click();
     console.log("🎉 Reservation confirmed!");
   }
 
@@ -62,17 +88,18 @@ export class ConfirmationPage {
   async cancelBooking(): Promise<void> {
     console.log("❌ Canceling booking (test mode)...");
 
-    // Click the Cancel button (black basic button)
-    await this.page.locator("button.ui.button.basic.black.tiny.fluid").click();
+    // Click the Cancel button
+    await this.cancelButton.click();
     await this.page.waitForTimeout(500);
 
     // Wait for the confirmation iframe to appear
     console.log("   Waiting for confirmation dialog...");
-    const iframe = this.page.frameLocator("iframe").first();
+    const iframe = this.getConfirmationIframe();
 
-    // Click Yes in the iframe (green approve button)
+    // Click Yes in the iframe
     console.log("   Confirming cancellation...");
-    await iframe.locator("button.ui.approve.button.green").click();
+    const yesButton = iframe.locator("button.ui.approve.button.green");
+    await yesButton.click();
 
     console.log("✅ Test completed - booking was canceled");
   }

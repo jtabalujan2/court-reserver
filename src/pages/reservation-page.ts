@@ -1,4 +1,4 @@
-import { Page } from "playwright";
+import { Page, Locator } from "playwright";
 import { ReservationConfig } from "../types.js";
 import { getTargetDate, getDayName } from "../date-utils.js";
 
@@ -9,8 +9,18 @@ import { getTargetDate, getDayName } from "../date-utils.js";
 export class ReservationPage {
   readonly page: Page;
 
+  // Locators
+  readonly pageHeading: Locator;
+  readonly pickleballButton: Locator;
+  readonly nextButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
+
+    // Initialize locators
+    this.pageHeading = page.getByText("Select date and time");
+    this.pickleballButton = page.locator('button.ButtonOption:has-text("Pickleball")');
+    this.nextButton = page.getByRole("button", { name: "Next" });
   }
 
   /**
@@ -18,9 +28,7 @@ export class ReservationPage {
    */
   async waitForPageLoad(): Promise<void> {
     console.log("⏳ Waiting for reservation page to load...");
-    await this.page
-      .getByText("Select date and time")
-      .waitFor({ state: "visible" });
+    await this.pageHeading.waitFor({ state: "visible" });
     console.log("✅ Reservation page loaded");
   }
 
@@ -34,6 +42,7 @@ export class ReservationPage {
 
     console.log(`🎯 Looking for date: ${dayName} ${dayNumber}`);
 
+    // Dynamic locator based on calculated date
     const dayButton = this.page.locator(
       `.day-container button:has(.day_name:text("${dayName}")):has(.day_number:text("${dayNumber}"))`
     );
@@ -47,18 +56,15 @@ export class ReservationPage {
    * Select Pickleball as the sport type
    */
   async selectSportType(): Promise<void> {
-    const pickleballButton = this.page.locator(
-      'button.ButtonOption:has-text("Pickleball")'
-    );
-    await pickleballButton.waitFor({ state: "visible" });
+    await this.pickleballButton.waitFor({ state: "visible" });
 
     // Check if already selected
-    const isSelected = await pickleballButton.evaluate((el) =>
+    const isSelected = await this.pickleballButton.evaluate((el) =>
       el.classList.contains("primary")
     );
 
     if (!isSelected) {
-      await pickleballButton.click();
+      await this.pickleballButton.click();
       console.log("✅ Selected Pickleball");
     } else {
       console.log("ℹ️  Pickleball already selected");
@@ -69,10 +75,7 @@ export class ReservationPage {
    * Select ALL time slots to book a 2-hour block
    * The system requires selecting all 4 consecutive 30-min slots
    */
-  async selectTimeSlot(
-    config: ReservationConfig,
-    testMode: boolean
-  ): Promise<void> {
+  async selectTimeSlot(config: ReservationConfig, testMode: boolean): Promise<void> {
     // Wait for times to load
     await this.page.waitForTimeout(1000);
 
@@ -83,6 +86,7 @@ export class ReservationPage {
     for (const timeSlot of config.timeSlots) {
       console.log(`   Selecting slot: ${timeSlot}`);
 
+      // Dynamic locator for each time slot
       const timeSlotButton = this.page.getByRole("button", { name: timeSlot });
 
       const isVisible = await timeSlotButton.isVisible().catch(() => false);
@@ -117,7 +121,7 @@ export class ReservationPage {
 
     console.log(`🎾 Looking for ${courtName}`);
 
-    // Use exact match to avoid matching PB Court 10, 11, etc.
+    // Dynamic locator for the specific court
     const courtButton = this.page.getByRole("button", {
       name: courtName,
       exact: true,
@@ -133,7 +137,7 @@ export class ReservationPage {
    */
   async clickNext(): Promise<void> {
     console.log("⏭️  Clicking Next...");
-    await this.page.getByRole("button", { name: "Next" }).click();
+    await this.nextButton.click();
     await this.page.waitForTimeout(500);
   }
 }

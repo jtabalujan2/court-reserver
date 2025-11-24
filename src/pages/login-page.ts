@@ -1,4 +1,4 @@
-import { Page } from "playwright";
+import { Page, Locator } from "playwright";
 
 /**
  * Page Object for the Login page
@@ -6,6 +6,8 @@ import { Page } from "playwright";
  */
 export class LoginPage {
   readonly page: Page;
+
+  // Note: Login iframe locators are accessed dynamically since they're in an iframe
 
   constructor(page: Page) {
     this.page = page;
@@ -39,15 +41,20 @@ export class LoginPage {
 
     const iframe = await this.getLoginIframe();
 
+    // Get iframe locators
+    const emailInput = iframe.getByRole("textbox", { name: "Email" });
+    const passwordInput = iframe.getByRole("textbox", { name: "Password" });
+    const signInButton = iframe.getByRole("button", { name: "Sign in" });
+
     // Wait for iframe to load
-    await iframe.getByRole("textbox", { name: "Email" }).waitFor();
+    await emailInput.waitFor();
 
     // Fill in credentials
-    await iframe.getByRole("textbox", { name: "Email" }).fill(email);
-    await iframe.getByRole("textbox", { name: "Password" }).fill(password);
+    await emailInput.fill(email);
+    await passwordInput.fill(password);
 
     // Click sign in
-    await iframe.getByRole("button", { name: "Sign in" }).click();
+    await signInButton.click();
 
     console.log("✅ Logged in successfully");
 
