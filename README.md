@@ -63,19 +63,25 @@ This project uses TypeScript for type safety and better development experience.
 
 ```
 src/
-├── index.ts                 # Main entry point, orchestrates the flow
-├── court-reserve.ts         # Main reservation orchestrator class
-├── reservation-steps.ts     # Individual step functions (login, select, confirm)
-├── date-utils.ts           # Date calculation utilities
-├── types.ts                # Shared TypeScript interfaces
-└── browsercat-client.ts    # Browser connection management
+├── index.ts                      # Main entry point
+├── court-reserve.ts              # Main orchestrator class
+├── pages/
+│   ├── login-page.ts            # Login page object
+│   ├── reservation-page.ts      # Date/time/court selection page
+│   └── confirmation-page.ts     # Booking confirmation page
+├── date-utils.ts                # Date calculation utilities
+├── types.ts                     # Shared TypeScript interfaces
+└── browsercat-client.ts         # Browser connection management
 ```
 
-**Why this structure?**
-- **Separation of concerns**: Each file has a single, clear purpose
-- **Easy to test**: Individual functions can be tested in isolation
-- **Easy to debug**: Find the relevant code quickly
-- **Easy to modify**: Change one part without affecting others
+**Multi-Page Object Model Pattern:**
+- **Separation by page**: Each page class represents a distinct part of the UI
+- **`LoginPage`**: Handles authentication (iframe-based login)
+- **`ReservationPage`**: Handles date, sport, time, and court selection
+- **`ConfirmationPage`**: Handles add users and final booking steps
+- **`CourtReserve`**: Thin orchestrator that coordinates page objects
+- **Single Responsibility**: Each page class has one clear purpose
+- **Easy to maintain**: Changes to one page don't affect others
 
 ### Available Commands
 
