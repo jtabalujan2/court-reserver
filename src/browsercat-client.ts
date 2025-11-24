@@ -1,12 +1,18 @@
-import { chromium } from "playwright";
+import { chromium, Browser, BrowserContext, Page } from "playwright";
 
 export class BrowsercatClient {
-  constructor(apiKey) {
+  private readonly apiKey: string;
+  private readonly url: string;
+  private browser?: Browser;
+  private context?: BrowserContext;
+  private page?: Page;
+
+  constructor(apiKey: string) {
     this.apiKey = apiKey;
     this.url = "wss://api.browsercat.com/connect";
   }
 
-  async connect() {
+  async connect(): Promise<Page> {
     this.browser = await chromium.connect(this.url, {
       headers: { "Api-Key": this.apiKey },
     });
@@ -19,7 +25,10 @@ export class BrowsercatClient {
     return this.page;
   }
 
-  async close() {
-    if (this.browser) await this.browser.close();
+  async close(): Promise<void> {
+    if (this.browser) {
+      await this.browser.close();
+    }
   }
 }
+

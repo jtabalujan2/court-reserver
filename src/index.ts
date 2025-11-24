@@ -6,7 +6,7 @@ import { CourtReserve } from "./court-reserve.js";
 dotenv.config({ path: ".env.local" });
 
 // Wait until exactly 2:00:00 PM local time
-async function waitUntil2PM() {
+async function waitUntil2PM(): Promise<void> {
   return new Promise((resolve) => {
     const check = () => {
       const now = new Date();
@@ -38,22 +38,31 @@ async function waitUntil2PM() {
   });
 }
 
-async function run() {
-  const bc = new BrowsercatClient(process.env.BROWSERCAT_API_KEY);
-  let page;
+async function run(): Promise<void> {
+  const apiKey = process.env.BROWSERCAT_API_KEY;
+  const email = process.env.RESERVE_EMAIL;
+  const password = process.env.RESERVE_PASSWORD;
+  const courtName = process.env.COURT_NAME;
+  const timeSlot = process.env.TIME_SLOT;
+
+  if (!apiKey || !email || !password || !courtName || !timeSlot) {
+    throw new Error("Missing required environment variables");
+  }
+
+  const bc = new BrowsercatClient(apiKey);
 
   try {
     console.log("Connecting to Browsercat...");
-    page = await bc.connect();
+    const page = await bc.connect();
 
     console.log("Waiting until exactly 2:00 PM...");
     await waitUntil2PM();
 
     const reserve = new CourtReserve(page, {
-      email: process.env.RESERVE_EMAIL,
-      password: process.env.RESERVE_PASSWORD,
-      courtName: process.env.COURT_NAME,
-      timeSlot: process.env.TIME_SLOT,
+      email,
+      password,
+      courtName,
+      timeSlot,
     });
 
     console.log("Logging in...");
@@ -71,9 +80,11 @@ async function run() {
     console.log("🎉 Court reserved successfully!");
   } catch (err) {
     console.error("❌ Error:", err);
+    throw err;
   } finally {
     await bc.close();
   }
 }
 
 run();
+

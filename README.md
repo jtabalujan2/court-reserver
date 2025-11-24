@@ -28,6 +28,17 @@ cp .env.example .env.local
 
 # 2. Edit .env.local with your credentials
 
-# 3. Run the script
-node src/index.js
+# 3. Run the script (TypeScript - no build needed for dev)
+npm run reserve
+
+# OR build and run production version
+npm run reserve:prod
 ```
+
+## Development
+
+This project uses TypeScript for type safety and better development experience.
+
+- **Dev mode**: `npm run reserve` - Uses tsx to run TypeScript directly
+- **Build**: `npm run build` - Compiles TypeScript to JavaScript in `dist/`
+- **Production**: `npm run reserve:prod` - Builds and runs the compiled version
