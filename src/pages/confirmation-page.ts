@@ -57,15 +57,23 @@ export class ConfirmationPage {
 
   /**
    * Cancel the booking (for test mode)
+   * Handles the iframe confirmation dialog
    */
   async cancelBooking(): Promise<void> {
     console.log("❌ Canceling booking (test mode)...");
-    await this.page.getByRole("button", { name: "Cancel" }).click();
+    
+    // Click the Cancel button (black basic button)
+    await this.page.locator('button.ui.button.basic.black.tiny.fluid').click();
     await this.page.waitForTimeout(500);
     
-    // Confirm the cancellation
+    // Wait for the confirmation iframe to appear
+    console.log("   Waiting for confirmation dialog...");
+    const iframe = this.page.frameLocator('iframe').first();
+    
+    // Click Yes in the iframe
     console.log("   Confirming cancellation...");
-    await this.page.getByRole("button", { name: " Yes" }).click();
+    await iframe.getByRole("button", { name: "Yes" }).click();
+    
     console.log("✅ Test completed - booking was canceled");
   }
 
@@ -77,7 +85,7 @@ export class ConfirmationPage {
     await this.addUser();
     await this.clickNext();
     await this.clickBook();
-    
+
     if (testMode) {
       await this.cancelBooking();
     } else {
