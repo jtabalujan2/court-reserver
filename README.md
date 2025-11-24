@@ -157,9 +157,10 @@ The bot automatically selects reservation dates, courts, and times based on the 
 
 ### Test Mode (`TEST_MODE=true`)
 Set `TEST_MODE=true` in your `.env.local` for easier testing:
-- **Date**: Same day next week (7 days from today)
-  - Example: If today is Thursday → next Thursday
+- **Date**: 6 days from today (avoids 7-day countdown period)
+  - Example: If today is Thursday → next Wednesday
 - **Court**: Court 1
 - **Times**: 2:00 PM, 2:30 PM, 3:00 PM, 3:30 PM (tries in order)
+- **Cancels at end**: Won't make actual reservation
 
 This is useful for testing the entire flow without waiting for Monday/Wednesday or competing for prime evening slots.

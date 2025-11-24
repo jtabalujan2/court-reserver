@@ -72,7 +72,7 @@ async function run(): Promise<void> {
     const page = await bc.connect();
 
     const testMode = process.env.TEST_MODE === "true";
-    
+
     if (testMode) {
       console.log("⚡ TEST_MODE enabled - running immediately");
     } else {

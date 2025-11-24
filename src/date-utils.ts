@@ -1,6 +1,6 @@
 /**
  * Calculate the target date to select
- * - Test mode: Same day next week (7 days from now)
+ * - Test mode: 6 days from now (avoids countdown period)
  * - Production: Next Monday or Wednesday
  */
 export function getTargetDate(testMode: boolean): Date {
@@ -8,8 +8,8 @@ export function getTargetDate(testMode: boolean): Date {
   const targetDate = new Date(today);
 
   if (testMode) {
-    // Test mode: Select same day next week
-    targetDate.setDate(today.getDate() + 7);
+    // Test mode: Select 6 days from now (avoids 7-day countdown)
+    targetDate.setDate(today.getDate() + 6);
   } else {
     // Production: Select next Monday (1) or Wednesday (3)
     const todayDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
