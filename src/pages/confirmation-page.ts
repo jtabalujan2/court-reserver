@@ -12,10 +12,28 @@ export class ConfirmationPage {
   }
 
   /**
-   * Skip adding additional users and proceed to booking
+   * Add a user to the reservation
    */
-  async skipAddUsers(): Promise<void> {
-    console.log("👥 Skipping Add Users step...");
+  async addUser(): Promise<void> {
+    console.log("👥 Adding user...");
+    
+    // Click "Add Users" button (note the leading space in the name)
+    await this.page.getByRole("button", { name: " Add Users" }).click();
+    await this.page.waitForTimeout(500);
+    
+    // Click the first "Add" button (there may be multiple, use nth(1) for the second one)
+    console.log("   Clicking Add button...");
+    await this.page.getByRole("button", { name: "Add" }).nth(1).click();
+    await this.page.waitForTimeout(500);
+    
+    console.log("✅ User added");
+  }
+
+  /**
+   * Click Next to proceed to booking
+   */
+  async clickNext(): Promise<void> {
+    console.log("⏭️  Clicking Next...");
     await this.page.getByRole("button", { name: "Next" }).click();
     await this.page.waitForTimeout(500);
   }
@@ -41,7 +59,8 @@ export class ConfirmationPage {
    * Complete the entire confirmation flow
    */
   async completeBooking(): Promise<void> {
-    await this.skipAddUsers();
+    await this.addUser();
+    await this.clickNext();
     await this.clickBook();
     await this.confirmBooking();
   }

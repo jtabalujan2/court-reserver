@@ -18,7 +18,9 @@ export class ReservationPage {
    */
   async waitForPageLoad(): Promise<void> {
     console.log("⏳ Waiting for reservation page to load...");
-    await this.page.getByText("Select date and time").waitFor({ state: "visible" });
+    await this.page
+      .getByText("Select date and time")
+      .waitFor({ state: "visible" });
     console.log("✅ Reservation page loaded");
   }
 
@@ -67,14 +69,17 @@ export class ReservationPage {
    * Select ALL time slots to book a 2-hour block
    * The system requires selecting all 4 consecutive 30-min slots
    */
-  async selectTimeSlot(config: ReservationConfig, testMode: boolean): Promise<void> {
+  async selectTimeSlot(
+    config: ReservationConfig,
+    testMode: boolean
+  ): Promise<void> {
     // Wait for times to load
     await this.page.waitForTimeout(1000);
 
     console.log(`⏰ Booking 2-hour block (4 x 30-min slots)...`);
-    
+
     let selectedCount = 0;
-    
+
     for (const timeSlot of config.timeSlots) {
       console.log(`   Selecting slot: ${timeSlot}`);
 
@@ -99,7 +104,7 @@ export class ReservationPage {
       const timeRange = testMode ? "2:00-4:00 PM" : "7:00-9:00 PM";
       throw new Error(`No available time slots found (tried ${timeRange})`);
     }
-    
+
     console.log(`✅ Selected ${selectedCount} time slot(s) for 2-hour booking`);
   }
 
@@ -132,4 +137,3 @@ export class ReservationPage {
     await this.page.waitForTimeout(500);
   }
 }
-
