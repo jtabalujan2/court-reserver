@@ -10,7 +10,6 @@ export function getTargetDate(testMode: boolean): Date {
   if (testMode) {
     // Test mode: Select same day next week
     targetDate.setDate(today.getDate() + 7);
-    console.log(`📅 Test mode: Selecting ${targetDate.toDateString()}`);
   } else {
     // Production: Select next Monday (1) or Wednesday (3)
     const todayDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
@@ -40,7 +39,6 @@ export function getTargetDate(testMode: boolean): Date {
     }
 
     targetDate.setDate(today.getDate() + daysToAdd);
-    console.log(`📅 Production mode: Selecting ${targetDate.toDateString()}`);
   }
 
   return targetDate;

@@ -19,7 +19,9 @@ export class ReservationPage {
 
     // Initialize locators
     this.pageHeading = page.getByText("Select date and time");
-    this.pickleballButton = page.locator('button.ButtonOption:has-text("Pickleball")');
+    this.pickleballButton = page.locator(
+      'button.ButtonOption:has-text("Pickleball")'
+    );
     this.nextButton = page.getByRole("button", { name: "Next" });
   }
 
@@ -27,9 +29,7 @@ export class ReservationPage {
    * Wait for the reservation page to load
    */
   async waitForPageLoad(): Promise<void> {
-    console.log("⏳ Waiting for reservation page to load...");
     await this.pageHeading.waitFor({ state: "visible" });
-    console.log("✅ Reservation page loaded");
   }
 
   /**
@@ -40,8 +40,6 @@ export class ReservationPage {
     const dayName = getDayName(targetDate);
     const dayNumber = targetDate.getDate().toString();
 
-    console.log(`🎯 Looking for date: ${dayName} ${dayNumber}`);
-
     // Dynamic locator based on calculated date
     const dayButton = this.page.locator(
       `.day-container button:has(.day_name:text("${dayName}")):has(.day_number:text("${dayNumber}"))`
@@ -49,7 +47,6 @@ export class ReservationPage {
 
     await dayButton.waitFor({ state: "visible" });
     await dayButton.click();
-    console.log(`✅ Selected date: ${dayName} ${dayNumber}`);
   }
 
   /**
@@ -65,9 +62,6 @@ export class ReservationPage {
 
     if (!isSelected) {
       await this.pickleballButton.click();
-      console.log("✅ Selected Pickleball");
-    } else {
-      console.log("ℹ️  Pickleball already selected");
     }
   }
 
@@ -75,17 +69,16 @@ export class ReservationPage {
    * Select ALL time slots to book a 2-hour block
    * The system requires selecting all 4 consecutive 30-min slots
    */
-  async selectTimeSlot(config: ReservationConfig, testMode: boolean): Promise<void> {
+  async selectTimeSlot(
+    config: ReservationConfig,
+    testMode: boolean
+  ): Promise<void> {
     // Wait for times to load
     await this.page.waitForTimeout(1000);
-
-    console.log(`⏰ Booking 2-hour block (4 x 30-min slots)...`);
 
     let selectedCount = 0;
 
     for (const timeSlot of config.timeSlots) {
-      console.log(`   Selecting slot: ${timeSlot}`);
-
       // Dynamic locator for each time slot
       const timeSlotButton = this.page.getByRole("button", { name: timeSlot });
 
@@ -95,12 +88,7 @@ export class ReservationPage {
         if (!isDisabled) {
           await timeSlotButton.click();
           selectedCount++;
-          console.log(`   ✅ Selected: ${timeSlot}`);
-        } else {
-          console.log(`   ⏭️  ${timeSlot} is disabled`);
         }
-      } else {
-        console.log(`   ⏭️  ${timeSlot} not found`);
       }
     }
 
@@ -108,8 +96,6 @@ export class ReservationPage {
       const timeRange = testMode ? "2:00-4:00 PM" : "7:00-9:00 PM";
       throw new Error(`No available time slots found (tried ${timeRange})`);
     }
-
-    console.log(`✅ Selected ${selectedCount} time slot(s) for 2-hour booking`);
   }
 
   /**
@@ -119,8 +105,6 @@ export class ReservationPage {
     // Wait for court details to load
     await this.page.waitForTimeout(500);
 
-    console.log(`🎾 Looking for ${courtName}`);
-
     // Dynamic locator for the specific court
     const courtButton = this.page.getByRole("button", {
       name: courtName,
@@ -129,14 +113,12 @@ export class ReservationPage {
 
     await courtButton.waitFor({ state: "visible", timeout: 5000 });
     await courtButton.click();
-    console.log(`✅ Selected court: ${courtName}`);
   }
 
   /**
    * Click the Next button to proceed
    */
   async clickNext(): Promise<void> {
-    console.log("⏭️  Clicking Next...");
     await this.nextButton.click();
     await this.page.waitForTimeout(500);
   }

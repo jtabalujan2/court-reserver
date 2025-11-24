@@ -37,8 +37,6 @@ export class LoginPage {
    * Login with email and password
    */
   async login(email: string, password: string): Promise<void> {
-    console.log("⏳ Waiting for login iframe...");
-
     const iframe = await this.getLoginIframe();
 
     // Get iframe locators
@@ -55,8 +53,6 @@ export class LoginPage {
 
     // Click sign in
     await signInButton.click();
-
-    console.log("✅ Logged in successfully");
 
     // Wait for navigation to complete
     await this.page.waitForLoadState("networkidle");

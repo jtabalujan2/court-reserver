@@ -36,25 +36,19 @@ export class ConfirmationPage {
    * Add a user to the reservation
    */
   async addUser(): Promise<void> {
-    console.log("👥 Adding user...");
-
     // Click "Add Users" button (note the leading space in the name)
     await this.addUsersButton.click();
     await this.page.waitForTimeout(500);
 
     // Click the first "Add" button (there may be multiple, use nth(1) for the second one)
-    console.log("   Clicking Add button...");
     await this.addButton.nth(1).click();
     await this.page.waitForTimeout(500);
-
-    console.log("✅ User added");
   }
 
   /**
    * Click Next to proceed to booking
    */
   async clickNext(): Promise<void> {
-    console.log("⏭️  Clicking Next...");
     await this.nextButton.click();
     await this.page.waitForTimeout(500);
   }
@@ -63,7 +57,6 @@ export class ConfirmationPage {
    * Click the Book button
    */
   async clickBook(): Promise<void> {
-    console.log("📝 Clicking Book...");
     await this.bookButton.click();
   }
 
@@ -71,14 +64,11 @@ export class ConfirmationPage {
    * Confirm the booking by clicking Yes
    */
   async confirmBooking(): Promise<void> {
-    console.log("✅ Confirming booking...");
-    
     // Get iframe and Yes button
     const iframe = this.getConfirmationIframe();
     const yesButton = iframe.locator("button.ui.approve.button.green");
-    
+
     await yesButton.click();
-    console.log("🎉 Reservation confirmed!");
   }
 
   /**
@@ -86,22 +76,16 @@ export class ConfirmationPage {
    * Handles the iframe confirmation dialog
    */
   async cancelBooking(): Promise<void> {
-    console.log("❌ Canceling booking (test mode)...");
-
     // Click the Cancel button
     await this.cancelButton.click();
     await this.page.waitForTimeout(500);
 
     // Wait for the confirmation iframe to appear
-    console.log("   Waiting for confirmation dialog...");
     const iframe = this.getConfirmationIframe();
 
     // Click Yes in the iframe
-    console.log("   Confirming cancellation...");
     const yesButton = iframe.locator("button.ui.approve.button.green");
     await yesButton.click();
-
-    console.log("✅ Test completed - booking was canceled");
   }
 
   /**

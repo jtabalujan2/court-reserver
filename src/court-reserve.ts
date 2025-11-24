@@ -40,15 +40,11 @@ export class CourtReserve {
         courtName: "PB Court 1",
         timeSlots: ["2-2:30pm", "2:30-3pm", "3-3:30pm", "3:30-4pm"],
       };
-      console.log("🧪 Test mode: PB Court 1, afternoon times (2:00-4:00 PM)");
     } else {
       this.config = {
         courtName: "PB Court 25",
         timeSlots: ["7-7:30pm", "7:30-8pm", "8-8:30pm", "8:30-9pm"],
       };
-      console.log(
-        "🚀 Production mode: PB Court 25, evening times (7:00-9:00 PM)"
-      );
     }
   }
 
