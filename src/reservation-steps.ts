@@ -58,7 +58,7 @@ export async function selectTimeSlot(
     console.log(`⏰ Trying time slot: ${timeSlot}`);
 
     // Use role-based selector (more reliable)
-    const timeSlotButton = page.getByRole('button', { name: timeSlot });
+    const timeSlotButton = page.getByRole("button", { name: timeSlot });
 
     // Check if this time slot is available
     const isVisible = await timeSlotButton.isVisible().catch(() => false);
@@ -92,17 +92,17 @@ export async function selectCourt(
   await page.waitForTimeout(500);
 
   console.log(`🎾 Looking for ${config.courtName}`);
-  
+
   // Use role-based selector for more reliability
-  const courtButton = page.getByRole('button', { name: config.courtName });
+  const courtButton = page.getByRole("button", { name: config.courtName });
 
   await courtButton.waitFor({ state: "visible", timeout: 5000 });
   await courtButton.click();
   console.log(`✅ Selected court: ${config.courtName}`);
-  
+
   // Click Next button to proceed
   console.log("⏭️  Clicking Next...");
-  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole("button", { name: "Next" }).click();
   await page.waitForTimeout(500);
 }
 
@@ -120,39 +120,38 @@ export async function login(
   );
 
   console.log("⏳ Waiting for login iframe...");
-  
+
   // The login form is inside an iframe
   const iframe = page
-    .locator('div')
-    .filter({ hasText: 'Enter your account ServicesServices' })
-    .locator('iframe')
+    .locator("div")
+    .filter({ hasText: "Enter your account ServicesServices" })
+    .locator("iframe")
     .contentFrame();
 
   // Wait for iframe to load
-  await iframe.getByRole('textbox', { name: 'Email' }).waitFor();
+  await iframe.getByRole("textbox", { name: "Email" }).waitFor();
 
   // Fill in credentials
-  await iframe.getByRole('textbox', { name: 'Email' }).fill(email);
-  await iframe.getByRole('textbox', { name: 'Password' }).fill(password);
-  
+  await iframe.getByRole("textbox", { name: "Email" }).fill(email);
+  await iframe.getByRole("textbox", { name: "Password" }).fill(password);
+
   // Click sign in
-  await iframe.getByRole('button', { name: 'Sign in' }).click();
-  
+  await iframe.getByRole("button", { name: "Sign in" }).click();
+
   console.log("✅ Logged in successfully");
-  
+
   // Wait for navigation to complete
   await page.waitForLoadState("networkidle");
 }
 
 /**
- * Navigate to the reservation page
+ * Wait for the reservation page to load after login
  */
-export async function navigateToReservation(page: Page): Promise<void> {
-  const reserveCourtLink = page.getByText("Reserve Court");
-  const availableCourtsText = page.getByText("Available Courts");
-
-  await reserveCourtLink.click();
-  await availableCourtsText.waitFor();
+export async function waitForReservationPage(page: Page): Promise<void> {
+  console.log("⏳ Waiting for reservation page to load...");
+  // Wait for the date selector heading to appear
+  await page.getByText("Select date and time").waitFor({ state: "visible" });
+  console.log("✅ Reservation page loaded");
 }
 
 /**
@@ -162,18 +161,18 @@ export async function navigateToReservation(page: Page): Promise<void> {
 export async function confirmReservation(page: Page): Promise<void> {
   // Skip adding additional users (or add them if needed)
   console.log("👥 Handling Add Users step...");
-  
+
   // Click Next to skip adding users (or click Add Users if you want to add someone)
-  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByRole("button", { name: "Next" }).click();
   await page.waitForTimeout(500);
-  
+
   // Click Book button
   console.log("📝 Clicking Book...");
-  await page.getByRole('button', { name: 'Book' }).click();
-  
+  await page.getByRole("button", { name: "Book" }).click();
+
   // Confirm the booking (Yes button)
   console.log("✅ Confirming booking...");
-  await page.getByRole('button', { name: 'Yes' }).click();
-  
+  await page.getByRole("button", { name: "Yes" }).click();
+
   console.log("🎉 Reservation confirmed!");
 }

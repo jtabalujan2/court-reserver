@@ -36,7 +36,9 @@ export class CourtReserve {
         courtName: "PB Court 25",
         timeSlots: ["-7:30pm", ":30-8pm", "-8:30pm", ":30-9pm"],
       };
-      console.log("🚀 Production mode: PB Court 25, evening times (7:00-9:00 PM)");
+      console.log(
+        "🚀 Production mode: PB Court 25, evening times (7:00-9:00 PM)"
+      );
     }
   }
 
@@ -48,10 +50,10 @@ export class CourtReserve {
   }
 
   /**
-   * Navigate to the reservation page
+   * Wait for the reservation page to load
    */
-  async navigateToReservation(): Promise<void> {
-    await steps.navigateToReservation(this.page);
+  async waitForReservationPage(): Promise<void> {
+    await steps.waitForReservationPage(this.page);
   }
 
   /**

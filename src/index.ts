@@ -78,8 +78,8 @@ async function run(): Promise<void> {
     console.log("Logging in...");
     await reserve.login();
 
-    console.log("Navigating to reservation page...");
-    await reserve.navigateToReservation();
+    console.log("Waiting for reservation page...");
+    await reserve.waitForReservationPage();
 
     console.log("Selecting court and time...");
     await reserve.selectCourtAndTime();
