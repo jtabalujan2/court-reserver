@@ -5,10 +5,7 @@ import { getTargetDate, getDayName } from "./date-utils.js";
 /**
  * Select the date from the calendar
  */
-export async function selectDate(
-  page: Page,
-  testMode: boolean
-): Promise<void> {
+export async function selectDate(page: Page, testMode: boolean): Promise<void> {
   const targetDate = getTargetDate(testMode);
   const dayName = getDayName(targetDate);
   const dayNumber = targetDate.getDate().toString();
@@ -97,9 +94,7 @@ export async function selectCourt(
   await page.waitForTimeout(500);
 
   console.log(`🎾 Looking for ${config.courtName}`);
-  const courtCard = page.locator(
-    `.court-card:has-text("${config.courtName}")`
-  );
+  const courtCard = page.locator(`.court-card:has-text("${config.courtName}")`);
 
   await courtCard.waitFor({ state: "visible", timeout: 5000 });
   await courtCard.click();
@@ -155,4 +150,3 @@ export async function confirmReservation(page: Page): Promise<void> {
   await confirmButton.click();
   await confirmationText.waitFor();
 }
-

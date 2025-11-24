@@ -7,9 +7,8 @@
     "build": "tsc",
     "reserve": "tsx src/index.ts",
     "reserve:prod": "npm run build && node dist/index.js",
-    "test:local": "PLAYWRIGHT_LOCAL=true TEST_MODE=true tsx src/index.ts",
-    "test:local:headed": "PLAYWRIGHT_LOCAL=true TEST_MODE=true HEADED=true tsx src/index.ts",
-    "test:local:debug": "PLAYWRIGHT_LOCAL=true TEST_MODE=true HEADED=true PWDEBUG=1 tsx src/index.ts"
+    "dev": "PLAYWRIGHT_LOCAL=true TEST_MODE=true HEADED=true tsx src/index.ts",
+    "debug": "PLAYWRIGHT_LOCAL=true TEST_MODE=true PWDEBUG=1 tsx src/index.ts"
   },
   "author": "julian t",
   "license": "ISC",

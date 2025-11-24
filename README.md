@@ -32,38 +32,27 @@ The bot tries each time slot in order until one is available.
 
 ## Local Testing
 
-### Option 1: Test with Local Browser (Recommended for Development)
-
-Test your changes with a visible browser on your machine:
+### Quick Start - Test Locally
 
 ```bash
 # 1. Create your local environment file
 cp .env.example .env.local
 
-# 2. Edit .env.local with your credentials (BROWSERCAT_API_KEY not needed for local testing)
+# 2. Edit .env.local with your credentials
+# (BROWSERCAT_API_KEY not needed for local testing)
 
-# 3. Run with visible browser (best for testing)
-npm run test:local:headed
+# 3. Run in development mode (visible browser, slower actions)
+npm run dev
 
-# OR run headless (faster)
-npm run test:local
-
-# OR run with Playwright inspector (step through each action)
-npm run test:local:debug
+# OR use Playwright Inspector (step through, pause, inspect elements)
+npm run debug
 ```
 
-### Option 2: Test with Browsercat (Cloud Browser)
-
-Test with the actual production Browsercat setup:
+### Production - Test with Browsercat
 
 ```bash
-# 1. Make sure BROWSERCAT_API_KEY is set in .env.local
-
-# 2. Run the script
+# Make sure BROWSERCAT_API_KEY is set in .env.local
 npm run reserve
-
-# OR build and run production version
-npm run reserve:prod
 ```
 
 ## Development
@@ -90,15 +79,23 @@ src/
 
 ### Available Commands
 
-**Testing Commands (use local Playwright):**
-- `npm run test:local:headed` - 🎬 Watch the browser in action (slowMo enabled)
-- `npm run test:local` - 🏃 Run headless locally (faster testing)
-- `npm run test:local:debug` - 🐛 Step through with Playwright Inspector
+**Development:**
+- `npm run dev` - 🎬 Watch browser in action (visible, slow motion)
+- `npm run debug` - 🐛 Playwright Inspector (step through, pause, inspect)
 
-**Production Commands (use Browsercat):**
+**Production:**
 - `npm run reserve` - Run with Browsercat (requires API key)
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm run reserve:prod` - Build then run compiled version
+
+### Playwright Inspector (`npm run debug`)
+
+The debug command opens Playwright Inspector where you can:
+- ▶️ Step through each action one at a time
+- ⏸️ Pause and inspect the page state
+- 🔍 Hover to highlight elements
+- 📝 See the code execution in real-time
+- 🎯 Perfect for debugging selectors and flow
 
 ## Date Selection Logic
 
