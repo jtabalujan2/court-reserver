@@ -42,7 +42,7 @@ export class CourtReserve {
       };
     } else {
       this.config = {
-        courtName: "PB Court 25",
+        courtName: "PB Court 24",
         timeSlots: ["7-7:30pm", "7:30-8pm", "8-8:30pm", "8:30-9pm"],
       };
     }
