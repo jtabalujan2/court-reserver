@@ -80,8 +80,9 @@ export class CourtReserve {
 
   /**
    * Confirm the reservation
+   * In test mode, cancels at the end instead of confirming
    */
   async confirmReservation(): Promise<void> {
-    await this.confirmationPage.completeBooking();
+    await this.confirmationPage.completeBooking(this.testMode);
   }
 }

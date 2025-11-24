@@ -16,16 +16,16 @@ export class ConfirmationPage {
    */
   async addUser(): Promise<void> {
     console.log("👥 Adding user...");
-    
+
     // Click "Add Users" button (note the leading space in the name)
     await this.page.getByRole("button", { name: " Add Users" }).click();
     await this.page.waitForTimeout(500);
-    
+
     // Click the first "Add" button (there may be multiple, use nth(1) for the second one)
     console.log("   Clicking Add button...");
     await this.page.getByRole("button", { name: "Add" }).nth(1).click();
     await this.page.waitForTimeout(500);
-    
+
     console.log("✅ User added");
   }
 
@@ -56,12 +56,32 @@ export class ConfirmationPage {
   }
 
   /**
-   * Complete the entire confirmation flow
+   * Cancel the booking (for test mode)
    */
-  async completeBooking(): Promise<void> {
+  async cancelBooking(): Promise<void> {
+    console.log("❌ Canceling booking (test mode)...");
+    await this.page.getByRole("button", { name: "Cancel" }).click();
+    await this.page.waitForTimeout(500);
+    
+    // Confirm the cancellation
+    console.log("   Confirming cancellation...");
+    await this.page.getByRole("button", { name: " Yes" }).click();
+    console.log("✅ Test completed - booking was canceled");
+  }
+
+  /**
+   * Complete the entire confirmation flow
+   * In test mode, cancels at the end instead of confirming
+   */
+  async completeBooking(testMode: boolean = false): Promise<void> {
     await this.addUser();
     await this.clickNext();
     await this.clickBook();
-    await this.confirmBooking();
+    
+    if (testMode) {
+      await this.cancelBooking();
+    } else {
+      await this.confirmBooking();
+    }
   }
 }
