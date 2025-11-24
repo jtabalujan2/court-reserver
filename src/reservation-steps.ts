@@ -93,8 +93,11 @@ export async function selectCourt(
 
   console.log(`🎾 Looking for ${config.courtName}`);
 
-  // Use role-based selector for more reliability
-  const courtButton = page.getByRole("button", { name: config.courtName });
+  // Use role-based selector with exact match to avoid matching PB Court 10, 11, etc.
+  const courtButton = page.getByRole("button", { 
+    name: config.courtName,
+    exact: true 
+  });
 
   await courtButton.waitFor({ state: "visible", timeout: 5000 });
   await courtButton.click();
