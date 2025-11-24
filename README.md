@@ -18,6 +18,27 @@ Automates reserving a tennis court using:
 - `RESERVE_EMAIL`
 - `RESERVE_PASSWORD`
 
+## GitHub Workflows
+
+### Production Workflow
+**File**: `.github/workflows/reserve.yml`
+- Runs automatically Monday & Wednesday at 2:00 PM PST
+- Books Court 25 at 7:00-9:00 PM
+- Can also be triggered manually via GitHub Actions UI
+
+### Test Workflow  
+**File**: `.github/workflows/test-reserve.yml`
+- **Manual trigger only** (workflow_dispatch)
+- Runs in TEST_MODE (Court 1, afternoon slots, cancels at the end)
+- Perfect for verifying the flow works end-to-end without making actual bookings
+
+**To run the test workflow:**
+1. Go to **Actions** tab in GitHub
+2. Select **"Test Court Reservation"** workflow
+3. Click **"Run workflow"**
+4. Optionally add a reason for the test run
+5. Watch it execute in test mode (will cancel at the end)
+
 **Note**: Court and time slots vary by mode:
 
 **Production Mode** (default):

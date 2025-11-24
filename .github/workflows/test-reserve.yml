@@ -1,0 +1,36 @@
+name: Test Court Reservation
+
+on:
+  # Manual trigger only
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for test run'
+        required: false
+        default: 'Manual test'
+
+jobs:
+  test-reserve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Test reservation flow (with cancel)
+        env:
+          BROWSERCAT_API_KEY: ${{ secrets.BROWSERCAT_API_KEY }}
+          RESERVE_EMAIL: ${{ secrets.RESERVE_EMAIL }}
+          RESERVE_PASSWORD: ${{ secrets.RESERVE_PASSWORD }}
+          TEST_MODE: true
+        run: node dist/index.js
+
