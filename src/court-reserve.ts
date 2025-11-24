@@ -1,94 +1,73 @@
-import { Page, Locator } from "playwright";
+import { Page } from "playwright";
+import { CourtReserveOptions, ReservationConfig } from "./types.js";
+import * as steps from "./reservation-steps.js";
 
-export interface CourtReserveOptions {
-  email: string;
-  password: string;
-  courtName: string;
-  timeSlot: string;
-}
+// Re-export types for convenience
+export type { CourtReserveOptions } from "./types.js";
 
+/**
+ * Main class for automating court reservations
+ * Orchestrates the reservation flow using modular step functions
+ */
 export class CourtReserve {
   readonly page: Page;
   readonly email: string;
   readonly password: string;
-  readonly courtName: string;
-  readonly timeSlot: string;
-
-  // Login page locators
-  readonly signInText: Locator;
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly signInButton: Locator;
-
-  // Navigation locators
-  readonly reserveCourtLink: Locator;
-  readonly availableCourtsText: Locator;
-
-  // Court selection locators
-  readonly courtCard: Locator;
-  readonly timeSlotButton: Locator;
-
-  // Confirmation locators
-  readonly confirmButton: Locator;
-  readonly confirmationText: Locator;
+  readonly testMode: boolean;
+  readonly config: ReservationConfig;
 
   constructor(page: Page, opts: CourtReserveOptions) {
     this.page = page;
-
-    // Configuration
     this.email = opts.email;
     this.password = opts.password;
-    this.courtName = opts.courtName;
-    this.timeSlot = opts.timeSlot;
+    this.testMode = opts.testMode ?? false;
 
-    // Login page locators
-    this.signInText = page.getByText("SIGN IN TO PLAYBYPOINT");
-    this.emailInput = page.locator("id=user_email");
-    this.passwordInput = page.locator("id=user_password");
-    this.signInButton = page.locator('input[type="submit"][value="Sign in"]');
-
-    // Navigation locators
-    this.reserveCourtLink = page.getByText("Reserve Court");
-    this.availableCourtsText = page.getByText("Available Courts");
-
-    // Court selection locators (dynamic based on config)
-    this.courtCard = page.locator(`.court-card:has-text("${this.courtName}")`);
-    this.timeSlotButton = page.getByRole("button", { name: this.timeSlot });
-
-    // Confirmation locators
-    this.confirmButton = page.getByRole("button", {
-      name: "Confirm Reservation",
-    });
-    this.confirmationText = page.getByText("Reservation Confirmed");
+    // Set court and time slots based on mode
+    if (this.testMode) {
+      // Test mode: easier times and court for testing
+      this.config = {
+        courtName: "Court 1",
+        timeSlots: ["2-2:30pm", "2:30-3pm", "3-3:30pm", "3:30-4pm"],
+      };
+      console.log("🧪 Test mode: Court 1, afternoon times (2:00-4:00 PM)");
+    } else {
+      // Production mode: prime evening slots
+      this.config = {
+        courtName: "Court 25",
+        timeSlots: ["7-7:30pm", "7:30-8pm", "8-8:30pm", "8:30-9pm"],
+      };
+      console.log("🚀 Production mode: Court 25, evening times (7:00-9:00 PM)");
+    }
   }
 
+  /**
+   * Login to the court reservation system
+   */
   async login(): Promise<void> {
-    await this.page.goto(
-      "https://app.playbypoint.com/book/ipicklewhittiernarrows?skip_waivers=true"
-    );
-
-    await this.signInText.waitFor();
-
-    await this.emailInput.fill(this.email);
-    await this.passwordInput.fill(this.password);
-
-    await this.signInButton.click();
-    await this.signInText.waitFor({ state: "hidden" });
+    await steps.login(this.page, this.email, this.password);
   }
 
+  /**
+   * Navigate to the reservation page
+   */
   async navigateToReservation(): Promise<void> {
-    await this.reserveCourtLink.click();
-    await this.availableCourtsText.waitFor();
+    await steps.navigateToReservation(this.page);
   }
 
+  /**
+   * Complete the entire court and time selection flow
+   */
   async selectCourtAndTime(): Promise<void> {
-    await this.courtCard.click();
-    await this.timeSlotButton.click();
+    await steps.selectDate(this.page, this.testMode);
+    await steps.selectSportType(this.page);
+    await steps.selectTimeSlot(this.page, this.config, this.testMode);
+    await steps.selectCourt(this.page, this.config);
   }
 
+  /**
+   * Confirm the reservation
+   */
   async confirmReservation(): Promise<void> {
-    await this.confirmButton.click();
-    await this.confirmationText.waitFor();
+    await steps.confirmReservation(this.page);
   }
 }
-

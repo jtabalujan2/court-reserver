@@ -42,14 +42,25 @@ async function run(): Promise<void> {
   const apiKey = process.env.BROWSERCAT_API_KEY;
   const email = process.env.RESERVE_EMAIL;
   const password = process.env.RESERVE_PASSWORD;
-  const courtName = process.env.COURT_NAME;
-  const timeSlot = process.env.TIME_SLOT;
+  const local = process.env.PLAYWRIGHT_LOCAL === "true";
+  const headed = process.env.HEADED === "true";
 
-  if (!apiKey || !email || !password || !courtName || !timeSlot) {
-    throw new Error("Missing required environment variables");
+  // In local mode, API key is optional
+  if (!local && !apiKey) {
+    throw new Error("BROWSERCAT_API_KEY is required when not in local mode");
   }
 
-  const bc = new BrowsercatClient(apiKey);
+  if (!email || !password) {
+    throw new Error(
+      "Missing required environment variables: RESERVE_EMAIL, RESERVE_PASSWORD"
+    );
+  }
+
+  const bc = new BrowsercatClient({
+    apiKey: apiKey || "",
+    local,
+    headed,
+  });
 
   try {
     console.log("Connecting to Browsercat...");
@@ -61,8 +72,7 @@ async function run(): Promise<void> {
     const reserve = new CourtReserve(page, {
       email,
       password,
-      courtName,
-      timeSlot,
+      testMode: process.env.TEST_MODE === "true",
     });
 
     console.log("Logging in...");
@@ -87,4 +97,3 @@ async function run(): Promise<void> {
 }
 
 run();
-
