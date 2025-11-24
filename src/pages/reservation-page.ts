@@ -78,6 +78,8 @@ export class ReservationPage {
 
     let selectedCount = 0;
 
+    console.log(`⏰ Trying time slots: ${config.timeSlots.join(", ")}`);
+
     for (const timeSlot of config.timeSlots) {
       // Dynamic locator for each time slot
       const timeSlotButton = this.page.getByRole("button", { name: timeSlot });
@@ -86,9 +88,14 @@ export class ReservationPage {
       if (isVisible) {
         const isDisabled = await timeSlotButton.isDisabled().catch(() => true);
         if (!isDisabled) {
+          console.log(`  ✓ Selected: ${timeSlot}`);
           await timeSlotButton.click();
           selectedCount++;
+        } else {
+          console.log(`  ✗ Disabled: ${timeSlot}`);
         }
+      } else {
+        console.log(`  ✗ Not visible: ${timeSlot}`);
       }
     }
 
@@ -96,6 +103,8 @@ export class ReservationPage {
       const timeRange = testMode ? "2:00-4:00 PM" : "7:00-9:00 PM";
       throw new Error(`No available time slots found (tried ${timeRange})`);
     }
+
+    console.log(`✅ Selected ${selectedCount} time slot(s)`);
   }
 
   /**
@@ -105,14 +114,28 @@ export class ReservationPage {
     // Wait for court details to load
     await this.page.waitForTimeout(500);
 
+    console.log(`🎾 Looking for court: ${courtName}`);
+
     // Dynamic locator for the specific court
     const courtButton = this.page.getByRole("button", {
       name: courtName,
       exact: true,
     });
 
-    await courtButton.waitFor({ state: "visible", timeout: 5000 });
-    await courtButton.click();
+    try {
+      await courtButton.waitFor({ state: "visible", timeout: 5000 });
+      await courtButton.click();
+      console.log(`✅ Selected court: ${courtName}`);
+    } catch (error) {
+      // Take screenshot for debugging
+      await this.page.screenshot({ path: "court-selection-error.png" });
+      console.log(
+        "❌ Court not found. Screenshot saved to: court-selection-error.png"
+      );
+      throw new Error(
+        `Court "${courtName}" not found or not available for the selected time slots`
+      );
+    }
   }
 
   /**
