@@ -46,4 +46,3 @@ export class ConfirmationPage {
     await this.confirmBooking();
   }
 }
-
