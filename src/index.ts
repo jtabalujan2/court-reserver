@@ -1,9 +1,14 @@
 import dotenv from "dotenv";
+import { existsSync } from "fs";
 import { BrowsercatClient } from "./browsercat-client.js";
 import { CourtReserve } from "./court-reserve.js";
 
-// Load .env.local for local development, but in CI the env vars are already set
-dotenv.config({ path: ".env.local" });
+// Load .env.local for local development, but in CI the env vars are already set via GitHub Actions
+if (existsSync(".env.local")) {
+  dotenv.config({ path: ".env.local" });
+} else if (existsSync(".env")) {
+  dotenv.config({ path: ".env" });
+}
 
 // Wait until exactly 2:00:00 PM local time
 async function waitUntil2PM(): Promise<void> {
