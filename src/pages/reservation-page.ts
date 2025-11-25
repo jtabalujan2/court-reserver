@@ -78,8 +78,6 @@ export class ReservationPage {
 
     let selectedCount = 0;
 
-    console.log(`⏰ Trying time slots: ${config.timeSlots.join(", ")}`);
-
     for (const timeSlot of config.timeSlots) {
       // Dynamic locator for each time slot
       const timeSlotButton = this.page.getByRole("button", { name: timeSlot });
@@ -88,14 +86,9 @@ export class ReservationPage {
       if (isVisible) {
         const isDisabled = await timeSlotButton.isDisabled().catch(() => true);
         if (!isDisabled) {
-          console.log(`  ✓ Selected: ${timeSlot}`);
           await timeSlotButton.click();
           selectedCount++;
-        } else {
-          console.log(`  ✗ Disabled: ${timeSlot}`);
         }
-      } else {
-        console.log(`  ✗ Not visible: ${timeSlot}`);
       }
     }
 
@@ -103,8 +96,6 @@ export class ReservationPage {
       const timeRange = testMode ? "2:00-4:00 PM" : "7:00-9:00 PM";
       throw new Error(`No available time slots found (tried ${timeRange})`);
     }
-
-    console.log(`✅ Selected ${selectedCount} time slot(s)`);
   }
 
   /**
@@ -115,11 +106,7 @@ export class ReservationPage {
     // Wait for court details to load
     await this.page.waitForTimeout(500);
 
-    console.log(`🎾 Trying courts in order: ${courtNames.join(", ")}`);
-
     for (const courtName of courtNames) {
-      console.log(`   Checking: ${courtName}`);
-
       // Dynamic locator for the specific court
       const courtButton = this.page.getByRole("button", {
         name: courtName,
@@ -129,24 +116,19 @@ export class ReservationPage {
       // Check if this court is available
       const isVisible = await courtButton.isVisible().catch(() => false);
       if (!isVisible) {
-        console.log(`   ⚠️  ${courtName} not visible, trying next...`);
         continue;
       }
 
       const isDisabled = await courtButton.isDisabled().catch(() => true);
       if (isDisabled) {
-        console.log(`   ⚠️  ${courtName} is disabled, trying next...`);
         continue;
       }
 
       // Court is available, select it
       await courtButton.click();
-      console.log(`✅ Selected court: ${courtName}`);
       return;
     }
 
-    // If we get here, no courts were available
-    await this.page.screenshot({ path: "court-selection-error.png" });
     throw new Error(
       `None of the specified courts are available: ${courtNames.join(", ")}`
     );

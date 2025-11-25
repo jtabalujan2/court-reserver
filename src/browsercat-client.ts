@@ -25,14 +25,12 @@ export class BrowsercatClient {
   async connect(): Promise<Page> {
     if (this.local) {
       // Local Playwright for testing
-      console.log(`🖥️  Launching local browser (headed: ${this.headed})`);
       this.browser = await chromium.launch({
         headless: !this.headed,
         slowMo: this.headed ? 100 : 0, // Slow down actions in headed mode
       });
     } else {
       // Browsercat for production
-      console.log("☁️  Connecting to Browsercat...");
       try {
         // Add timeout to prevent hanging
         this.browser = await Promise.race([
@@ -48,7 +46,6 @@ export class BrowsercatClient {
             )
           ),
         ]);
-        console.log("✅ Connected to Browsercat");
       } catch (error) {
         console.error("❌ Browsercat connection failed:", error);
         throw new Error(

@@ -43,7 +43,13 @@ export class CourtReserve {
     // Test mode config
     if (this.testMode) {
       this.config = {
-        courtNames: ["PB Court 1", "PB Court 2", "PB Court 3", "PB Court 4", "PB Court 5"],
+        courtNames: [
+          "PB Court 1",
+          "PB Court 2",
+          "PB Court 3",
+          "PB Court 4",
+          "PB Court 5",
+        ],
         timeSlots: ["2-2:30pm ", "2:30-3pm ", "3-3:30pm ", "3:30-4pm "],
       };
     }
