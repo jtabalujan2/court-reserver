@@ -13,6 +13,4 @@ services:
         sync: false # Set this in Render dashboard
       - key: RESERVE_PASSWORD
         sync: false # Set this in Render dashboard
-    # Optional: configure memory and CPU
-    plan: free
 
