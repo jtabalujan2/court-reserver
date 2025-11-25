@@ -5,10 +5,10 @@ on:
     branches:
       - master
     paths:
-      - 'src/**'
-      - 'package*.json'
-      - 'Dockerfile.aws'
-      - '.github/workflows/deploy-lambda.yml'
+      - "src/**"
+      - "package*.json"
+      - "Dockerfile.aws"
+      - ".github/workflows/deploy-lambda.yml"
   workflow_dispatch: # Manual trigger
 
 env:
@@ -19,11 +19,11 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
       id-token: write # Required for OIDC
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -67,13 +67,8 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ env.LAMBDA_FUNCTION }} \
             --image-uri ${{ steps.build-image.outputs.image }}
-          
-          # Wait for update to complete
-          aws lambda wait function-updated \
-            --function-name ${{ env.LAMBDA_FUNCTION }}
 
       - name: Deployment success
         run: |
           echo "✅ Deployed to Lambda successfully!"
           echo "Image: ${{ steps.build-image.outputs.image }}"
-
