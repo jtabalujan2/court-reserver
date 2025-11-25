@@ -1,6 +1,7 @@
 services:
+  # Production: Runs Mon/Wed at 2:00 PM PST and books court
   - type: cron
-    name: court-reserver
+    name: court-reserver-prod
     env: docker
     # Monday and Wednesday at 2:00 PM PST (22:00 UTC)
     # Note: Adjust to 21:00 during PDT (daylight saving time)
@@ -8,6 +9,23 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: PLAYWRIGHT_LOCAL
+        value: "true"
+      - key: RESERVE_EMAIL
+        sync: false # Set this in Render dashboard
+      - key: RESERVE_PASSWORD
+        sync: false # Set this in Render dashboard
+
+  # Test: Manual trigger only - never runs automatically
+  - type: cron
+    name: court-reserver-test
+    env: docker
+    # Set to never run (Feb 30th doesn't exist)
+    schedule: "0 0 30 2 *"
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PLAYWRIGHT_LOCAL
+        value: "true"
+      - key: TEST_MODE
         value: "true"
       - key: RESERVE_EMAIL
         sync: false # Set this in Render dashboard
