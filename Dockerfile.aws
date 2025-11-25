@@ -1,0 +1,15 @@
+# Use AWS Lambda Node.js base image
+FROM public.ecr.aws/lambda/nodejs:20
+
+# Copy package files
+COPY package*.json ${LAMBDA_TASK_ROOT}/
+
+# Install all dependencies (including @sparticuz/chromium)
+RUN npm ci
+
+# Copy built code
+COPY dist ${LAMBDA_TASK_ROOT}/dist
+
+# Set Lambda handler
+CMD [ "dist/lambda.handler" ]
+

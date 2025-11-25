@@ -5,47 +5,43 @@ Automates reserving a tennis court using:
 - Playwright (browser automation)
 - Clean Page Object Model architecture
 - Exact 2:00 PM execution
-- Render.com for reliable scheduling (recommended) or GitHub Actions
+- AWS Lambda + EventBridge (recommended), Render.com, or GitHub Actions
 
-## 🚀 Production Deployment (Recommended: Render.com)
+## 🚀 Production Deployment (Recommended: AWS Lambda)
 
-Render.com provides **reliable, precise scheduling** (no delays like GitHub Actions).
+AWS Lambda + EventBridge provides **enterprise-grade reliability, precise scheduling, and is completely FREE** for this usage.
 
-### Quick Deploy to Render
+### Quick Deploy
 
-1. **Fork/Clone this repo** to your GitHub account
+📖 **[Follow the AWS Deployment Guide](./AWS-DEPLOY.md)** - Step-by-step instructions
 
-2. **Sign up** at [render.com](https://render.com) (free)
+It takes about 10 minutes to set up and covers:
+1. Building your code
+2. Creating Docker image and pushing to ECR
+3. Setting up Lambda function
+4. Configuring EventBridge schedule (Mon/Wed 1:59pm PST)
+5. Testing and monitoring
 
-3. **Create a new Blueprint**:
-   - Click "New" → "Blueprint"
-   - Connect your GitHub repository
-   - Render will detect `render.yaml` automatically
+### Why AWS Lambda?
 
-4. **Set environment variables** in Render dashboard:
-   - `RESERVE_EMAIL` - Your login email
-   - `RESERVE_PASSWORD` - Your login password
+✅ **100% Free** - 1M requests/month free tier (you use ~8/month)  
+✅ **Precise scheduling** - EventBridge is rock-solid (no delays like GitHub Actions)  
+✅ **Reliable** - Enterprise-grade infrastructure  
+✅ **Optimized** - Uses @sparticuz/chromium for fast Lambda execution  
+✅ **1-minute buffer** - Starts at 1:59 PM, executes at exactly 2:00 PM
 
-5. **Deploy!** - Render will:
-   - Build the Docker image
-   - Set up the cron job
-   - Run automatically Mon/Wed at 2:00 PM PST
+### Cost
 
-### Adjust Schedule
-
-Edit `render.yaml` to change timing:
-```yaml
-schedule: "0 22 * * 1,3"  # 2:00 PM PST (22:00 UTC)
-```
-
-**Note:** Adjust to `21:00` UTC during daylight saving time (PDT).
-
-### Monitor Logs
-
-- View logs in Render dashboard under your cron job
-- See each execution result and any errors
+- **Lambda**: $0 (well under free tier)
+- **EventBridge**: $0 (free tier covers it)
+- **ECR storage**: ~$0.10/month
+- **Total**: ~$0.10/month
 
 ---
+
+## Alternative: Render.com
+
+Render.com is simpler if you don't want to deal with AWS.
 
 ## Alternative: GitHub Actions (Less Reliable)
 

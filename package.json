@@ -15,8 +15,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@sparticuz/chromium": "^141.0.0",
     "dotenv": "^17.2.3",
-    "playwright": "^1.56.1"
+    "playwright": "^1.56.1",
+    "playwright-core": "^1.56.1"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
