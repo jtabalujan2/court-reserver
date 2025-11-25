@@ -2,20 +2,82 @@
 
 Automates reserving a tennis court using:
 
-- GitHub Actions (scheduled)
-- Playwright (headless browser automation)
+- Playwright (browser automation)
 - Clean Page Object Model architecture
 - Exact 2:00 PM execution
+- Render.com for reliable scheduling (recommended) or GitHub Actions
 
-## Setup
+## 🚀 Production Deployment (Recommended: Render.com)
+
+Render.com provides **reliable, precise scheduling** (no delays like GitHub Actions).
+
+### Quick Deploy to Render
+
+1. **Fork/Clone this repo** to your GitHub account
+
+2. **Sign up** at [render.com](https://render.com) (free)
+
+3. **Create a new Blueprint**:
+   - Click "New" → "Blueprint"
+   - Connect your GitHub repository
+   - Render will detect `render.yaml` automatically
+
+4. **Set environment variables** in Render dashboard:
+   - `RESERVE_EMAIL` - Your login email
+   - `RESERVE_PASSWORD` - Your login password
+
+5. **Deploy!** - Render will:
+   - Build the Docker image
+   - Set up the cron job
+   - Run automatically Mon/Wed at 2:00 PM PST
+
+### Adjust Schedule
+
+Edit `render.yaml` to change timing:
+```yaml
+schedule: "0 22 * * 1,3"  # 2:00 PM PST (22:00 UTC)
+```
+
+**Note:** Adjust to `21:00` UTC during daylight saving time (PDT).
+
+### Monitor Logs
+
+- View logs in Render dashboard under your cron job
+- See each execution result and any errors
+
+---
+
+## Alternative: GitHub Actions (Less Reliable)
+
+GitHub Actions is still available but **not recommended** for production due to scheduling delays (5-20 minutes).
+
+**Why GitHub Actions has delays:**
+- Scheduled workflows run on shared infrastructure
+- High load times (start of every hour) cause delays
+- No guarantee of exact execution time
+
+**If you still want to use GitHub Actions:**
+
+1. Set secrets in GitHub repository settings:
+   - `RESERVE_EMAIL`
+   - `RESERVE_PASSWORD`
+
+2. Workflows will run automatically:
+   - **reserve.yml**: Mon/Wed at ~1:40 PM PST (waits until 2:00 PM)
+   - **test-reserve.yml**: Manual trigger only
+
+**⚠️ Important:** Due to GitHub's delays, you may miss the 2:00 PM booking window. Use Render.com for reliable timing.
+
+---
+
+## Local Development Setup
 
 1. Clone repo
 2. Run `npm install`
 3. Create `.env.local` based on `.env.example`
-4. Add GitHub secrets:
-
-- `RESERVE_EMAIL`
-- `RESERVE_PASSWORD`
+4. Set your credentials:
+   - `RESERVE_EMAIL`
+   - `RESERVE_PASSWORD`
 
 ## GitHub Workflows
 
@@ -41,7 +103,7 @@ Automates reserving a tennis court using:
 **Note**: Court and time slots vary by mode:
 
 **Production Mode** (default):
-- Court: **PB Court 25**
+- Courts: **PB Court 24, PB Court 25** (tries in order)
 - Time slots: **7-7:30pm, 7:30-8pm, 8-8:30pm, 8:30-9pm**
 
 **Test Mode** (`TEST_MODE=true`):
