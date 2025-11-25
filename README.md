@@ -3,8 +3,8 @@
 Automates reserving a tennis court using:
 
 - GitHub Actions (scheduled)
-- Browsercat (instant browser, avoids delays)
-- Playwright + clean class structure
+- Playwright (headless browser automation)
+- Clean Page Object Model architecture
 - Exact 2:00 PM execution
 
 ## Setup
@@ -14,7 +14,6 @@ Automates reserving a tennis court using:
 3. Create `.env.local` based on `.env.example`
 4. Add GitHub secrets:
 
-- `BROWSERCAT_API_KEY`
 - `RESERVE_EMAIL`
 - `RESERVE_PASSWORD`
 

@@ -16,16 +16,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
 
       - name: Build TypeScript
         run: npm run build
 
       - name: Run reservation bot
         env:
-          BROWSERCAT_API_KEY: ${{ secrets.BROWSERCAT_API_KEY }}
+          PLAYWRIGHT_LOCAL: true
           RESERVE_EMAIL: ${{ secrets.RESERVE_EMAIL }}
           RESERVE_PASSWORD: ${{ secrets.RESERVE_PASSWORD }}
         run: node dist/index.js
