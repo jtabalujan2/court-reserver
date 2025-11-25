@@ -53,8 +53,5 @@ export class LoginPage {
 
     // Click sign in
     await signInButton.click();
-
-    // Wait for navigation to complete
-    await this.page.waitForLoadState("networkidle");
   }
 }

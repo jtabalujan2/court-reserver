@@ -24,7 +24,9 @@ export class ConfirmationPage {
     this.nextButton = page.getByRole("button", { name: "Next" });
     this.bookButton = page.getByRole("button", { name: "Book" });
     this.cancelButton = page.locator("button.ui.button.basic.black.tiny.fluid");
-    this.confirmYesButton = page.locator("button.ui.approve.right.labeled.icon.button.green");
+    this.confirmYesButton = page.locator(
+      "button.ui.approve.right.labeled.icon.button.green"
+    );
   }
 
   /**
