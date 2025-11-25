@@ -68,7 +68,11 @@ async function run(): Promise<void> {
   });
 
   try {
-    console.log("Connecting to Browsercat...");
+    if (local) {
+      console.log("🖥️  Launching local Playwright browser...");
+    } else {
+      console.log("☁️  Connecting to Browsercat...");
+    }
     const page = await bc.connect();
 
     const testMode = process.env.TEST_MODE === "true";

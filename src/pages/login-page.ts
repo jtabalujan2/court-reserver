@@ -29,7 +29,8 @@ export class LoginPage {
    */
   async goto(): Promise<void> {
     await this.page.goto(
-      "https://app.playbypoint.com/book/ipicklewhittiernarrows?skip_waivers=true"
+      "https://app.playbypoint.com/book/ipicklewhittiernarrows?skip_waivers=true",
+      { waitUntil: "networkidle" }
     );
   }
 
@@ -37,6 +38,14 @@ export class LoginPage {
    * Login with email and password
    */
   async login(email: string, password: string): Promise<void> {
+    // Wait for iframe to be attached to the DOM
+    const iframeLocator = this.page
+      .locator("div")
+      .filter({ hasText: "Enter your account ServicesServices" })
+      .locator("iframe");
+    
+    await iframeLocator.waitFor({ state: "attached", timeout: 10000 });
+    
     const iframe = await this.getLoginIframe();
 
     // Get iframe locators
@@ -45,13 +54,14 @@ export class LoginPage {
     const signInButton = iframe.getByRole("button", { name: "Sign in" });
 
     // Wait for iframe to load
-    await emailInput.waitFor({ state: "visible" });
+    await emailInput.waitFor({ state: "visible", timeout: 10000 });
 
     // Fill in credentials
     await emailInput.fill(email);
     await passwordInput.fill(password);
 
-    // Click sign in
+    // Click sign in and wait for navigation
     await signInButton.click();
+    await this.page.waitForLoadState("networkidle");
   }
 }
