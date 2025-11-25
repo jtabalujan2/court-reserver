@@ -241,6 +241,7 @@ echo "Go to: https://github.com/$GITHUB_REPO/settings/secrets/actions/new"
 ## ✅ Done!
 
 Now every time you push code to `master` branch:
+
 - GitHub Actions builds TypeScript
 - Builds Docker image
 - Pushes to ECR
@@ -260,6 +261,7 @@ Go to your repo → **Actions** tab to watch the deployment!
 ### Manual Deploy
 
 You can also trigger deployment manually:
+
 1. Go to **Actions** tab
 2. Select **"Deploy to AWS Lambda"**
 3. Click **"Run workflow"**
@@ -269,4 +271,3 @@ You can also trigger deployment manually:
 ```bash
 aws logs tail /aws/lambda/court-reserver --region $AWS_REGION --follow
 ```
-
