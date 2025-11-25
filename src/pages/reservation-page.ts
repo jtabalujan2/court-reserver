@@ -108,34 +108,48 @@ export class ReservationPage {
   }
 
   /**
-   * Select a specific court
+   * Select a court from a list of acceptable courts
+   * Tries each court in order until one is available
    */
-  async selectCourt(courtName: string): Promise<void> {
+  async selectCourt(courtNames: string[]): Promise<void> {
     // Wait for court details to load
     await this.page.waitForTimeout(500);
 
-    console.log(`🎾 Looking for court: ${courtName}`);
+    console.log(`🎾 Trying courts in order: ${courtNames.join(", ")}`);
 
-    // Dynamic locator for the specific court
-    const courtButton = this.page.getByRole("button", {
-      name: courtName,
-      exact: true,
-    });
+    for (const courtName of courtNames) {
+      console.log(`   Checking: ${courtName}`);
 
-    try {
-      await courtButton.waitFor({ state: "visible", timeout: 5000 });
+      // Dynamic locator for the specific court
+      const courtButton = this.page.getByRole("button", {
+        name: courtName,
+        exact: true,
+      });
+
+      // Check if this court is available
+      const isVisible = await courtButton.isVisible().catch(() => false);
+      if (!isVisible) {
+        console.log(`   ⚠️  ${courtName} not visible, trying next...`);
+        continue;
+      }
+
+      const isDisabled = await courtButton.isDisabled().catch(() => true);
+      if (isDisabled) {
+        console.log(`   ⚠️  ${courtName} is disabled, trying next...`);
+        continue;
+      }
+
+      // Court is available, select it
       await courtButton.click();
       console.log(`✅ Selected court: ${courtName}`);
-    } catch (error) {
-      // Take screenshot for debugging
-      await this.page.screenshot({ path: "court-selection-error.png" });
-      console.log(
-        "❌ Court not found. Screenshot saved to: court-selection-error.png"
-      );
-      throw new Error(
-        `Court "${courtName}" not found or not available for the selected time slots`
-      );
+      return;
     }
+
+    // If we get here, no courts were available
+    await this.page.screenshot({ path: "court-selection-error.png" });
+    throw new Error(
+      `None of the specified courts are available: ${courtNames.join(", ")}`
+    );
   }
 
   /**

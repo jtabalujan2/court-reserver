@@ -7,7 +7,7 @@ export interface CourtReserveOptions {
 }
 
 export interface ReservationConfig {
-  courtName: string;
+  courtNames: string[]; // List of courts to try in order
   timeSlots: string[];
 }
 

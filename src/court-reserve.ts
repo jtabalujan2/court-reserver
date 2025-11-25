@@ -34,16 +34,17 @@ export class CourtReserve {
     this.reservationPage = new ReservationPage(page);
     this.confirmationPage = new ConfirmationPage(page);
 
-    // Set court and time slots based on mode
+    // Default config for production mode
+    this.config = {
+      courtNames: ["PB Court 24", "PB Court 25"],
+      timeSlots: ["7-7:30pm ", "7:30-8pm ", "8-8:30pm ", "8:30-9pm "],
+    };
+
+    // Test mode config
     if (this.testMode) {
       this.config = {
-        courtName: "PB Court 5",
+        courtNames: ["PB Court 1", "PB Court 2", "PB Court 3", "PB Court 4", "PB Court 5"],
         timeSlots: ["2-2:30pm ", "2:30-3pm ", "3-3:30pm ", "3:30-4pm "],
-      };
-    } else {
-      this.config = {
-        courtName: "PB Court 24",
-        timeSlots: ["7-7:30pm ", "7:30-8pm ", "8-8:30pm ", "8:30-9pm "],
       };
     }
   }
@@ -70,7 +71,7 @@ export class CourtReserve {
     await this.reservationPage.selectDate(this.testMode);
     await this.reservationPage.selectSportType();
     await this.reservationPage.selectTimeSlot(this.config, this.testMode);
-    await this.reservationPage.selectCourt(this.config.courtName);
+    await this.reservationPage.selectCourt(this.config.courtNames);
     await this.reservationPage.clickNext();
   }
 
