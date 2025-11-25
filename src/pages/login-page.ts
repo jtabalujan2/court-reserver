@@ -45,7 +45,7 @@ export class LoginPage {
     const signInButton = iframe.getByRole("button", { name: "Sign in" });
 
     // Wait for iframe to load
-    await emailInput.waitFor();
+    await emailInput.waitFor({ state: "visible" });
 
     // Fill in credentials
     await emailInput.fill(email);

@@ -1,4 +1,4 @@
-import { Page, Locator, FrameLocator } from "playwright";
+import { Page, Locator } from "playwright";
 
 /**
  * Page Object for the Confirmation/Booking page
@@ -13,6 +13,7 @@ export class ConfirmationPage {
   readonly nextButton: Locator;
   readonly bookButton: Locator;
   readonly cancelButton: Locator;
+  readonly confirmYesButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -23,13 +24,7 @@ export class ConfirmationPage {
     this.nextButton = page.getByRole("button", { name: "Next" });
     this.bookButton = page.getByRole("button", { name: "Book" });
     this.cancelButton = page.locator("button.ui.button.basic.black.tiny.fluid");
-  }
-
-  /**
-   * Get the confirmation iframe
-   */
-  private getConfirmationIframe(): FrameLocator {
-    return this.page.frameLocator("iframe").first();
+    this.confirmYesButton = page.locator("button.ui.approve.right.labeled.icon.button.green");
   }
 
   /**
@@ -64,31 +59,26 @@ export class ConfirmationPage {
    * Confirm the booking by clicking Yes
    */
   async confirmBooking(): Promise<void> {
-    // Get iframe and Yes button
-    const iframe = this.getConfirmationIframe();
-    const yesButton = iframe.locator("button.ui.approve.button.green");
-
-    await yesButton.click();
+    await this.confirmYesButton.waitFor({ state: "visible", timeout: 5000 });
+    await this.confirmYesButton.click();
   }
 
   /**
    * Cancel the booking (for test mode)
-   * Handles the iframe confirmation dialog
+   * Handles the modal confirmation dialog
    */
   async cancelBooking(): Promise<void> {
     // Click Cancel button
     await this.cancelButton.click();
     await this.page.waitForTimeout(500);
 
-    // Wait for iframe and click Yes to confirm cancellation
-    const iframe = this.getConfirmationIframe();
-    const yesButton = iframe.locator("button.ui.approve.button.green");
-    await yesButton.waitFor({ state: "visible", timeout: 5000 });
+    // Wait for modal to appear and click Yes to confirm cancellation
+    await this.confirmYesButton.waitFor({ state: "visible", timeout: 5000 });
 
     // Click Yes and wait for navigation to reservations page
     await Promise.all([
       this.page.waitForURL("**/account/reservations", { timeout: 10000 }),
-      yesButton.click(),
+      this.confirmYesButton.click(),
     ]);
   }
 
