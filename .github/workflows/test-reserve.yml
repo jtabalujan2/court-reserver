@@ -41,8 +41,9 @@ jobs:
       - name: Test reservation flow (with cancel)
         env:
           PLAYWRIGHT_LOCAL: true
+          HEADED: true
           RESERVE_EMAIL: ${{ secrets.RESERVE_EMAIL }}
           RESERVE_PASSWORD: ${{ secrets.RESERVE_PASSWORD }}
           TEST_MODE: true
-        run: node dist/index.js
+        run: xvfb-run --auto-servernum -- node dist/index.js
 

@@ -43,9 +43,9 @@ export class LoginPage {
       .locator("div")
       .filter({ hasText: "Enter your account ServicesServices" })
       .locator("iframe");
-    
+
     await iframeLocator.waitFor({ state: "attached", timeout: 10000 });
-    
+
     const iframe = await this.getLoginIframe();
 
     // Get iframe locators

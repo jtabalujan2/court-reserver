@@ -38,6 +38,7 @@ jobs:
       - name: Run reservation bot
         env:
           PLAYWRIGHT_LOCAL: true
+          HEADED: true
           RESERVE_EMAIL: ${{ secrets.RESERVE_EMAIL }}
           RESERVE_PASSWORD: ${{ secrets.RESERVE_PASSWORD }}
-        run: node dist/index.js
+        run: xvfb-run --auto-servernum -- node dist/index.js
