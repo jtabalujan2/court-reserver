@@ -1,227 +1,246 @@
 # Court Reservation Bot
 
-Automates reserving a tennis court using:
+Automates reserving pickleball courts using:
+- **AWS Lambda** + EventBridge for reliable scheduling
+- **Playwright** for browser automation
+- **@sparticuz/chromium** for optimized Lambda performance
+- **GitHub Actions** for CI/CD auto-deployment
+- **Page Object Model** for clean, maintainable code
 
-- Playwright (browser automation)
-- Clean Page Object Model architecture
-- Exact 2:00 PM execution
-- AWS Lambda + EventBridge (recommended), Render.com, or GitHub Actions
+## 🚀 Production Setup
 
-## 🚀 Production Deployment (Recommended: AWS Lambda with CI/CD)
+### Current Deployment
 
-AWS Lambda + EventBridge provides **enterprise-grade reliability, precise scheduling, and is completely FREE** for this usage.
+✅ **Already deployed to AWS Lambda!**
 
-### Automated Deployment with GitHub Actions
+- **Function**: `court-reserver`
+- **Schedule**: Mon/Wed at 1:59 PM PST (waits until 2:00 PM to execute)
+- **Courts**: Court 24-25 at 7:00-9:00 PM (2-hour blocks)
+- **Auto-deploy**: Every code push updates Lambda automatically
 
-📖 **[Follow the AWS Setup Guide](./AWS-SETUP.md)** - One-time setup (~10 minutes)
+### GitHub Secrets Required
 
-After initial setup, **every code push auto-deploys** via GitHub Actions:
-1. Run setup commands once (creates Lambda, ECR, IAM roles)
-2. Configure GitHub Actions secrets
-3. Push code → Automatic deployment! 🎉
+Add these at: https://github.com/jtabalujan2/court-reserver/settings/secrets/actions
 
-**What gets automated:**
-- TypeScript build
-- Docker image build & push to ECR
-- Lambda function updates
-- Zero manual deployment after setup
+| Secret | Value |
+|--------|-------|
+| `AWS_ROLE_ARN` | `arn:aws:iam::340706125656:role/github-actions-court-reserver` |
+| `RESERVE_EMAIL` | Your email for the court booking site |
+| `RESERVE_PASSWORD` | Your password for the court booking site |
 
-### Why AWS Lambda?
+### Update Lambda Environment Variables
 
-✅ **100% Free** - 1M requests/month free tier (you use ~8/month)  
-✅ **Precise scheduling** - EventBridge is rock-solid (no delays like GitHub Actions)  
-✅ **Reliable** - Enterprise-grade infrastructure  
-✅ **Optimized** - Uses @sparticuz/chromium for fast Lambda execution  
-✅ **1-minute buffer** - Starts at 1:59 PM, executes at exactly 2:00 PM
-
-### Cost
-
-- **Lambda**: $0 (well under free tier)
-- **EventBridge**: $0 (free tier covers it)
-- **ECR storage**: ~$0.10/month
-- **Total**: ~$0.10/month
-
----
-
-## Alternative: Render.com
-
-Render.com is simpler if you don't want to deal with AWS.
-
-## Alternative: GitHub Actions (Less Reliable)
-
-GitHub Actions is still available but **not recommended** for production due to scheduling delays (5-20 minutes).
-
-**Why GitHub Actions has delays:**
-- Scheduled workflows run on shared infrastructure
-- High load times (start of every hour) cause delays
-- No guarantee of exact execution time
-
-**If you still want to use GitHub Actions:**
-
-1. Set secrets in GitHub repository settings:
-   - `RESERVE_EMAIL`
-   - `RESERVE_PASSWORD`
-
-2. Workflows will run automatically:
-   - **reserve.yml**: Mon/Wed at ~1:40 PM PST (waits until 2:00 PM)
-   - **test-reserve.yml**: Manual trigger only
-
-**⚠️ Important:** Due to GitHub's delays, you may miss the 2:00 PM booking window. Use Render.com for reliable timing.
-
----
-
-## Local Development Setup
-
-1. Clone repo
-2. Run `npm install`
-3. Create `.env.local` based on `.env.example`
-4. Set your credentials:
-   - `RESERVE_EMAIL`
-   - `RESERVE_PASSWORD`
-
-## GitHub Workflows
-
-### Production Workflow
-**File**: `.github/workflows/reserve.yml`
-- Runs automatically Monday & Wednesday at 2:00 PM PST
-- Books Court 25 at 7:00-9:00 PM
-- Can also be triggered manually via GitHub Actions UI
-
-### Test Workflow  
-**File**: `.github/workflows/test-reserve.yml`
-- **Manual trigger only** (workflow_dispatch)
-- Runs in TEST_MODE (Court 1, afternoon slots, cancels at the end)
-- Perfect for verifying the flow works end-to-end without making actual bookings
-
-**To run the test workflow:**
-1. Go to **Actions** tab in GitHub
-2. Select **"Test Court Reservation"** workflow
-3. Click **"Run workflow"**
-4. Optionally add a reason for the test run
-5. Watch it execute in test mode (will cancel at the end)
-
-**Note**: Court and time slots vary by mode:
-
-**Production Mode** (default):
-- Courts: **PB Court 24, PB Court 25** (tries in order)
-- Time slots: **7-7:30pm, 7:30-8pm, 8-8:30pm, 8:30-9pm**
-
-**Test Mode** (`TEST_MODE=true`):
-- Court: **PB Court 1**
-- Time slots: **2-2:30pm, 2:30-3pm, 3-3:30pm, 3:30-4pm**
-
-The bot tries each time slot in order until one is available.
-
-## Local Testing
-
-### Quick Start - Test Locally
+After adding GitHub secrets, update Lambda with your credentials:
 
 ```bash
-# 1. Create your local environment file
-cp .env.example .env.local
-
-# 2. Edit .env.local with your credentials
-# (BROWSERCAT_API_KEY not needed for local testing)
-
-# 3. Run in development mode (visible browser, slower actions)
-npm run dev
-
-# OR use Playwright Inspector (step through, pause, inspect elements)
-npm run debug
+aws lambda update-function-configuration \
+  --function-name court-reserver \
+  --environment "Variables={
+    PLAYWRIGHT_LOCAL=true,
+    RESERVE_EMAIL=your-email@example.com,
+    RESERVE_PASSWORD=your-password
+  }" \
+  --region us-west-2
 ```
 
-### Production - Test with Browsercat
+### Manual Testing
+
+Test the Lambda function anytime:
 
 ```bash
-# Make sure BROWSERCAT_API_KEY is set in .env.local
+# Invoke manually
+aws lambda invoke \
+  --function-name court-reserver \
+  --region us-west-2 \
+  response.json
+
+# View response
+cat response.json
+
+# View logs
+aws logs tail /aws/lambda/court-reserver --region us-west-2 --follow
+```
+
+---
+
+## 💻 Local Development
+
+### Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Create local env file
+cp .env.example .env.local
+
+# Edit .env.local with your credentials
+# RESERVE_EMAIL=your-email@example.com
+# RESERVE_PASSWORD=yourpassword
+```
+
+### Local Testing Commands
+
+```bash
+# Test locally (visible browser, test mode - cancels at end)
+npm run dev
+
+# Debug with Playwright Inspector
+npm run debug
+
+# Generate locators with Codegen
+npm run codegen
+```
+
+### Test vs Production Mode
+
+**Test Mode** (`TEST_MODE=true`):
+- Courts: 1-5 (tries in order)
+- Time: 2:00-4:00 PM
+- Date: 6 days ahead
+- **Cancels reservation at the end**
+
+**Production Mode** (default):
+- Courts: 24-25 (tries in order)
+- Time: 7:00-9:00 PM
+- Date: Next Monday or Wednesday
+- **Confirms reservation**
+
+---
+
+## 📂 Project Structure
+
+```
+court-reserver/
+├── src/
+│   ├── pages/              # Page Object Model
+│   │   ├── login-page.ts
+│   │   ├── reservation-page.ts
+│   │   └── confirmation-page.ts
+│   ├── court-reserve.ts    # Main orchestrator
+│   ├── date-utils.ts       # Date calculation logic
+│   ├── types.ts            # TypeScript interfaces
+│   ├── lambda.ts           # AWS Lambda handler
+│   ├── index.ts            # Local development entry
+│   └── browsercat-client.ts # Browser launcher wrapper
+├── .github/workflows/
+│   └── deploy-lambda.yml   # CI/CD auto-deployment
+├── Dockerfile.aws          # Lambda container image
+├── tsconfig.json           # TypeScript configuration
+└── package.json            # Dependencies & scripts
+```
+
+---
+
+## 🔄 CI/CD Workflow
+
+Every push to `master` triggers automatic deployment:
+
+1. **Build TypeScript** → Compile to `dist/`
+2. **Build Docker image** → Lambda container with Chromium
+3. **Push to ECR** → AWS container registry
+4. **Update Lambda** → Deploy new code
+
+View deployments: https://github.com/jtabalujan2/court-reserver/actions
+
+---
+
+## 💰 Cost Breakdown
+
+| Service | Cost |
+|---------|------|
+| Lambda execution | **FREE** (~8 invocations/month, 1M free tier) |
+| EventBridge scheduling | **FREE** |
+| ECR storage | **~$0.10/month** (single Docker image) |
+| **Total** | **~$0.10/month** |
+
+---
+
+## 🛠️ Development Commands
+
+```bash
+# Build TypeScript
+npm run build
+
+# Run locally (test mode, visible browser)
+npm run dev
+
+# Debug with Playwright Inspector
+npm run debug
+
+# Generate locators
+npm run codegen
+
+# Run production mode locally
 npm run reserve
 ```
 
-## Development
+---
 
-This project uses TypeScript for type safety and better development experience.
+## 📝 Notes
 
-### Project Structure
+### Date Selection Logic
 
-```
-src/
-├── index.ts                      # Main entry point
-├── court-reserve.ts              # Main orchestrator class
-├── pages/
-│   ├── login-page.ts            # Login page object
-│   ├── reservation-page.ts      # Date/time/court selection page
-│   └── confirmation-page.ts     # Booking confirmation page
-├── date-utils.ts                # Date calculation utilities
-├── types.ts                     # Shared TypeScript interfaces
-└── browsercat-client.ts         # Browser connection management
-```
+**Production**: Books courts for the **next Monday or Wednesday**
+- If today is Mon: Books next Mon (7 days ahead)
+- If today is Tue-Sun: Books next Mon
+- If today is Wed: Books next Wed (7 days ahead)  
+- If today is Thu-Tue: Books next Wed
 
-**Multi-Page Object Model Pattern:**
-- **Separation by page**: Each page class represents a distinct part of the UI
-- **`LoginPage`**: Handles authentication (iframe-based login)
-- **`ReservationPage`**: Handles date, sport, time, and court selection
-- **`ConfirmationPage`**: Handles add users and final booking steps
-- **`CourtReserve`**: Thin orchestrator that coordinates page objects
-- **Single Responsibility**: Each page class has one clear purpose
-- **Easy to maintain**: Changes to one page don't affect others
+**Test Mode**: Books **6 days ahead** (avoids countdown period)
 
-### Available Commands
+### Court Selection
 
-**Development:**
-- `npm run dev` - 🎬 Watch browser in action (visible, slow motion)
-- `npm run debug` - 🐛 Playwright Inspector (step through, pause, inspect)
+The bot tries courts in priority order until one is available:
+- **Production**: Courts 24 → 25
+- **Test**: Courts 1 → 2 → 3 → 4 → 5
 
-**Production:**
-- `npm run reserve` - Run with Browsercat (requires API key)
-- `npm run build` - Compile TypeScript to JavaScript
-- `npm run reserve:prod` - Build then run compiled version
+If none are available, the script fails with an error.
 
-### Debugging Tools
+### Time Slots
 
-**Playwright Inspector (`npm run debug`):**
-- ▶️ Step through each action one at a time
-- ⏸️ Pause and inspect the page state
-- 🎯 **Pick Locator** button - click elements to get their locators
-- 📝 See the code execution in real-time
+Always books **2-hour blocks** (4 consecutive 30-minute slots):
+- **Production**: 7:00-9:00 PM
+- **Test**: 2:00-4:00 PM
 
-**Codegen - Record Actions (`npm run codegen`):**
-- Opens browser + recorder
-- Click around the site normally (login, select court, etc.)
-- Playwright **generates the code** for you automatically
-- Shows you the **exact locators** that work
-- Copy/paste the generated code into your project
+---
 
-**How to use codegen:**
-```bash
-npm run codegen
+## 🐛 Troubleshooting
 
-# Then in the browser:
-# 1. Fill in email/password and click sign in
-# 2. Click "Reserve Court"
-# 3. Select date, sport, time, court
-# 4. Copy the generated locators from the Inspector
-```
+**Lambda not executing?**
+- Check EventBridge rule is enabled: `aws events describe-rule --name court-reserver-schedule --region us-west-2`
+- Check Lambda logs: `aws logs tail /aws/lambda/court-reserver --region us-west-2 --follow`
 
-## Date Selection Logic
+**Deployment failing?**
+- Verify GitHub secrets are set correctly
+- Check GitHub Actions logs: https://github.com/jtabalujan2/court-reserver/actions
 
-The bot automatically selects reservation dates, courts, and times based on the mode:
+**Local testing not working?**
+- Ensure `.env.local` exists with correct credentials
+- Run `npm install` to ensure dependencies are installed
+- Check Playwright is installed: `npx playwright install chromium`
 
-### Production Mode (default)
-- **Date**: Next Monday or Wednesday
-  - If today is Sunday → next Monday
-  - If today is Monday → next Wednesday  
-  - If today is Tuesday → next Wednesday
-  - If today is Wednesday → next Monday (5 days ahead)
-  - If today is Thursday/Friday/Saturday → next Monday
-- **Court**: Court 25
-- **Times**: 7:00 PM, 7:30 PM, 8:00 PM, 8:30 PM (tries in order)
+---
 
-### Test Mode (`TEST_MODE=true`)
-Set `TEST_MODE=true` in your `.env.local` for easier testing:
-- **Date**: 6 days from today (avoids 7-day countdown period)
-  - Example: If today is Thursday → next Wednesday
-- **Court**: Court 1
-- **Times**: 2:00 PM, 2:30 PM, 3:00 PM, 3:30 PM (tries in order)
-- **Cancels at end**: Won't make actual reservation
+## 📚 Tech Stack
 
-This is useful for testing the entire flow without waiting for Monday/Wednesday or competing for prime evening slots.
+- **TypeScript** - Type-safe code
+- **Playwright** - Browser automation
+- **AWS Lambda** - Serverless compute
+- **@sparticuz/chromium** - Lambda-optimized browser
+- **EventBridge** - Scheduled triggers
+- **GitHub Actions** - CI/CD pipeline
+- **Docker** - Container packaging
+- **ECR** - Container registry
+
+---
+
+## 🤝 Contributing
+
+This is a personal project, but feel free to fork and adapt for your own court reservation needs!
+
+---
+
+## 📄 License
+
+MIT
