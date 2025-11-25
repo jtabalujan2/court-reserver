@@ -154,6 +154,7 @@ Your Lambda function will now run every Monday and Wednesday at 1:59 PM PST. It 
 ## Testing
 
 ### Manual Test
+
 ```bash
 aws lambda invoke \
   --function-name court-reserver \
@@ -165,6 +166,7 @@ cat response.json
 ```
 
 ### View Logs
+
 ```bash
 aws logs tail /aws/lambda/court-reserver --region $AWS_REGION --follow
 ```
@@ -213,4 +215,3 @@ aws iam delete-role --role-name court-reserver-role
 # Delete ECR repository
 aws ecr delete-repository --repository-name court-reserver --force --region $AWS_REGION
 ```
-

@@ -7,20 +7,24 @@ Automates reserving a tennis court using:
 - Exact 2:00 PM execution
 - AWS Lambda + EventBridge (recommended), Render.com, or GitHub Actions
 
-## 🚀 Production Deployment (Recommended: AWS Lambda)
+## 🚀 Production Deployment (Recommended: AWS Lambda with CI/CD)
 
 AWS Lambda + EventBridge provides **enterprise-grade reliability, precise scheduling, and is completely FREE** for this usage.
 
-### Quick Deploy
+### Automated Deployment with GitHub Actions
 
-📖 **[Follow the AWS Deployment Guide](./AWS-DEPLOY.md)** - Step-by-step instructions
+📖 **[Follow the AWS Setup Guide](./AWS-SETUP.md)** - One-time setup (~10 minutes)
 
-It takes about 10 minutes to set up and covers:
-1. Building your code
-2. Creating Docker image and pushing to ECR
-3. Setting up Lambda function
-4. Configuring EventBridge schedule (Mon/Wed 1:59pm PST)
-5. Testing and monitoring
+After initial setup, **every code push auto-deploys** via GitHub Actions:
+1. Run setup commands once (creates Lambda, ECR, IAM roles)
+2. Configure GitHub Actions secrets
+3. Push code → Automatic deployment! 🎉
+
+**What gets automated:**
+- TypeScript build
+- Docker image build & push to ECR
+- Lambda function updates
+- Zero manual deployment after setup
 
 ### Why AWS Lambda?
 

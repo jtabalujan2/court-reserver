@@ -1,5 +1,4 @@
 node_modules
-dist
 .git
 .github
 .env
@@ -10,4 +9,6 @@ dist
 .cursorignore
 court-selection-error.png
 npm-debug.log
+src
+tsconfig.json
 
