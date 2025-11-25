@@ -73,18 +73,23 @@ export class ConfirmationPage {
 
   /**
    * Cancel the booking (for test mode)
-   * Clicks cancel and waits for navigation to reservations page
+   * Handles the iframe confirmation dialog
    */
   async cancelBooking(): Promise<void> {
-    console.log("🚫 Canceling reservation (test mode)...");
-    
-    // Click the Cancel button and wait for navigation
+    // Click Cancel button
+    await this.cancelButton.click();
+    await this.page.waitForTimeout(500);
+
+    // Wait for iframe and click Yes to confirm cancellation
+    const iframe = this.getConfirmationIframe();
+    const yesButton = iframe.locator("button.ui.approve.button.green");
+    await yesButton.waitFor({ state: "visible", timeout: 5000 });
+
+    // Click Yes and wait for navigation to reservations page
     await Promise.all([
       this.page.waitForURL("**/account/reservations", { timeout: 10000 }),
-      this.cancelButton.click(),
+      yesButton.click(),
     ]);
-
-    console.log("✅ Reservation canceled successfully");
   }
 
   /**
