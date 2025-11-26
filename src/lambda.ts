@@ -25,13 +25,19 @@ export async function handler(event: any) {
     console.log("🖥️  Launching optimized Chromium in Lambda...");
     
     // Use @sparticuz/chromium for optimized Lambda execution
-    // Add extra args for iframe support in headless mode
+    // Add extra args for iframe support and to avoid bot detection
     browser = await chromium.launch({
       args: [
         ...chromiumPkg.args,
         '--disable-web-security',
         '--disable-features=IsolateOrigins,site-per-process',
         '--disable-blink-features=AutomationControlled',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--window-size=1280,900',
       ],
       executablePath: await chromiumPkg.executablePath(),
       headless: true,
@@ -39,6 +45,22 @@ export async function handler(event: any) {
     
     const context = await browser.newContext({
       viewport: { width: 1280, height: 900 },
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      locale: 'en-US',
+      timezoneId: 'America/Los_Angeles',
+      permissions: ['geolocation'],
+      geolocation: { latitude: 34.0522, longitude: -118.2437 }, // Los Angeles coords
+      extraHTTPHeaders: {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+      },
     });
     
     const page = await context.newPage();
