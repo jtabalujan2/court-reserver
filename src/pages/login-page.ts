@@ -38,31 +38,14 @@ export class LoginPage {
    * Login with email and password
    */
   async login(email: string, password: string): Promise<void> {
-    // Wait extra time for page to fully load in Lambda
+    // Wait extra time for page to fully load (especially in Lambda)
     await this.page.waitForTimeout(5000);
-    
-    // Debug: Check page content
-    const bodyText = await this.page.locator('body').textContent();
-    console.log("📄 Page text (first 500 chars):", bodyText?.substring(0, 500));
-    
-    const iframeCount = await this.page.locator('iframe').count();
-    console.log("🖼️  Iframe count on page:", iframeCount);
-    
-    // Wait for iframe to be attached to the DOM (longer timeout for Lambda)
+
+    // Wait for iframe to be attached to the DOM
     const iframeLocator = this.page
       .locator("div")
       .filter({ hasText: "Enter your account ServicesServices" })
       .locator("iframe");
-
-    const iframeExists = await iframeLocator.count();
-    console.log("🔍 Login iframe found:", iframeExists > 0);
-    
-    if (iframeExists === 0) {
-      // Try alternative: maybe user is already logged in or page layout changed
-      const hasSignInText = await this.page.getByText("Sign in").isVisible().catch(() => false);
-      console.log("🔑 Has 'Sign in' text visible:", hasSignInText);
-      throw new Error("Login iframe not found on page. Possible reasons: 1) Already logged in, 2) Page layout changed, 3) Headless detection");
-    }
 
     await iframeLocator.waitFor({ state: "attached", timeout: 30000 });
 
