@@ -25,8 +25,14 @@ export async function handler(event: any) {
     console.log("🖥️  Launching optimized Chromium in Lambda...");
     
     // Use @sparticuz/chromium for optimized Lambda execution
+    // Add extra args for iframe support in headless mode
     browser = await chromium.launch({
-      args: chromiumPkg.args,
+      args: [
+        ...chromiumPkg.args,
+        '--disable-web-security',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-blink-features=AutomationControlled',
+      ],
       executablePath: await chromiumPkg.executablePath(),
       headless: true,
     });
