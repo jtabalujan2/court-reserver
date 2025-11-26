@@ -38,13 +38,16 @@ export class LoginPage {
    * Login with email and password
    */
   async login(email: string, password: string): Promise<void> {
-    // Wait for iframe to be attached to the DOM
+    // Wait extra time for page to fully load in Lambda
+    await this.page.waitForTimeout(3000);
+    
+    // Wait for iframe to be attached to the DOM (longer timeout for Lambda)
     const iframeLocator = this.page
       .locator("div")
       .filter({ hasText: "Enter your account ServicesServices" })
       .locator("iframe");
 
-    await iframeLocator.waitFor({ state: "attached", timeout: 10000 });
+    await iframeLocator.waitFor({ state: "attached", timeout: 30000 });
 
     const iframe = await this.getLoginIframe();
 
@@ -53,8 +56,8 @@ export class LoginPage {
     const passwordInput = iframe.getByRole("textbox", { name: "Password" });
     const signInButton = iframe.getByRole("button", { name: "Sign in" });
 
-    // Wait for iframe to load
-    await emailInput.waitFor({ state: "visible", timeout: 10000 });
+    // Wait for iframe to load (longer timeout for Lambda)
+    await emailInput.waitFor({ state: "visible", timeout: 30000 });
 
     // Fill in credentials
     await emailInput.fill(email);
