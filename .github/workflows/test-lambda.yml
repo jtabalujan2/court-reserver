@@ -1,0 +1,83 @@
+name: Test Lambda Manually
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Run in test mode (cancels reservation)'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  invoke-lambda:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+          role-session-name: github-actions-lambda-test
+
+      - name: Set Lambda environment for test mode
+        if: ${{ inputs.test_mode }}
+        run: |
+          echo "🧪 Configuring Lambda for TEST MODE..."
+          aws lambda update-function-configuration \
+            --function-name court-reserver \
+            --environment "Variables={TEST_MODE=true,RESERVE_EMAIL=${{ secrets.RESERVE_EMAIL }},RESERVE_PASSWORD=${{ secrets.RESERVE_PASSWORD }}}" \
+            --query 'LastUpdateStatus' \
+            --output text
+          
+          echo "⏳ Waiting for configuration update..."
+          sleep 15
+
+      - name: Set Lambda environment for production mode
+        if: ${{ !inputs.test_mode }}
+        run: |
+          echo "🎯 Configuring Lambda for PRODUCTION MODE..."
+          aws lambda update-function-configuration \
+            --function-name court-reserver \
+            --environment "Variables={RESERVE_EMAIL=${{ secrets.RESERVE_EMAIL }},RESERVE_PASSWORD=${{ secrets.RESERVE_PASSWORD }}}" \
+            --query 'LastUpdateStatus' \
+            --output text
+          
+          echo "⏳ Waiting for configuration update..."
+          sleep 15
+
+      - name: Invoke Lambda
+        run: |
+          echo "🚀 Invoking Lambda function..."
+          aws lambda invoke \
+            --function-name court-reserver \
+            --payload '{}' \
+            --cli-binary-format raw-in-base64-out \
+            --log-type Tail \
+            response.json \
+            --query 'LogResult' \
+            --output text | base64 -d
+          
+          echo ""
+          echo "📄 Response:"
+          cat response.json | jq '.'
+          
+          # Check if it was successful
+          if jq -e '.statusCode == 200' response.json > /dev/null; then
+            echo "✅ Lambda execution successful!"
+          else
+            echo "❌ Lambda execution failed"
+            exit 1
+          fi
+
+      - name: View CloudWatch logs
+        if: always()
+        run: |
+          echo "📊 View full logs at:"
+          echo "https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/\$252Faws\$252Flambda\$252Fcourt-reserver"
+
