@@ -36,7 +36,7 @@ export class CourtReserve {
 
     // Default config for production mode
     this.config = {
-      courtNames: ["PB Court 24", "PB Court 25"],
+      courtNames: ["PB Court 17", "PB Court 24", "PB Court 25"],
       timeSlots: ["7-7:30pm ", "7:30-8pm ", "8-8:30pm ", "8:30-9pm "],
     };
 
