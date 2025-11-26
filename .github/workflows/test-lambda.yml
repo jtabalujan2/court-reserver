@@ -1,10 +1,10 @@
-name: Test Lambda Manually
+name: Test Reservation on Lambda
 
 on:
   workflow_dispatch:
     inputs:
       test_mode:
-        description: 'Run in test mode (cancels reservation)'
+        description: "Run in test mode (creates reserveration + cancels reservation)"
         required: false
         type: boolean
         default: true
@@ -12,7 +12,7 @@ on:
 jobs:
   invoke-lambda:
     runs-on: ubuntu-latest
-    
+
     permissions:
       id-token: write
       contents: read
@@ -34,7 +34,7 @@ jobs:
             --environment "Variables={TEST_MODE=true,RESERVE_EMAIL=${{ secrets.RESERVE_EMAIL }},RESERVE_PASSWORD=${{ secrets.RESERVE_PASSWORD }}}" \
             --query 'LastUpdateStatus' \
             --output text
-          
+
           echo "⏳ Waiting for configuration update..."
           sleep 15
 
@@ -47,7 +47,7 @@ jobs:
             --environment "Variables={RESERVE_EMAIL=${{ secrets.RESERVE_EMAIL }},RESERVE_PASSWORD=${{ secrets.RESERVE_PASSWORD }}}" \
             --query 'LastUpdateStatus' \
             --output text
-          
+
           echo "⏳ Waiting for configuration update..."
           sleep 15
 
@@ -62,11 +62,11 @@ jobs:
             response.json \
             --query 'LogResult' \
             --output text | base64 -d
-          
+
           echo ""
           echo "📄 Response:"
           cat response.json | jq '.'
-          
+
           # Check if it was successful
           if jq -e '.statusCode == 200' response.json > /dev/null; then
             echo "✅ Lambda execution successful!"
@@ -80,4 +80,3 @@ jobs:
         run: |
           echo "📊 View full logs at:"
           echo "https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/\$252Faws\$252Flambda\$252Fcourt-reserver"
-
