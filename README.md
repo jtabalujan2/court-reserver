@@ -18,6 +18,26 @@ Automates reserving pickleball courts using:
 - **Courts**: Court 24-25 at 7:00-9:00 PM (2-hour blocks)
 - **Auto-deploy**: Every code push updates Lambda automatically
 
+### 💰 Cost Analysis
+
+**Completely FREE!** 🎉
+
+Based on actual execution metrics:
+- **Execution time**: ~30 seconds per run
+- **Memory used**: 814 MB (of 2048 MB allocated)
+- **Runs per month**: 8 (2 per week × 4 weeks)
+- **Total compute**: 64 GB-seconds × 8 = 512 GB-seconds/month
+
+AWS Lambda Free Tier (always free):
+- ✅ 1M requests/month (we use 8)
+- ✅ 400,000 GB-seconds/month (we use 512)
+
+**Result**: Well within free tier limits. Zero cost! 💵
+
+Even if you exceeded free tier:
+- Cost per execution: ~$0.001 (0.1 cent)
+- Monthly cost: ~$0.008 (less than 1 cent)
+
 ### GitHub Secrets Required
 
 Add these at: https://github.com/jtabalujan2/court-reserver/settings/secrets/actions
@@ -45,7 +65,18 @@ aws lambda update-function-configuration \
 
 ### Manual Testing
 
-Test the Lambda function anytime:
+#### Option 1: GitHub Actions (Easiest!)
+
+Go to: https://github.com/jtabalujan2/court-reserver/actions/workflows/test-lambda.yml
+
+1. Click "Run workflow"
+2. Choose test mode (default: on - will cancel reservation)
+3. Click green "Run workflow" button
+4. Watch the logs in real-time!
+
+#### Option 2: AWS CLI
+
+Test the Lambda function directly:
 
 ```bash
 # Invoke manually
