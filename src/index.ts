@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { existsSync } from "fs";
-import { BrowsercatClient } from "./browsercat-client.js";
+import { BrowserClient } from "./browser-client.js";
 import { CourtReserve } from "./court-reserve.js";
 
 // Load .env.local for local development, but in CI the env vars are already set via GitHub Actions
@@ -61,7 +61,7 @@ async function run(): Promise<void> {
     );
   }
 
-  const bc = new BrowsercatClient({
+  const bc = new BrowserClient({
     apiKey: apiKey || "",
     local,
     headed,

@@ -1,23 +1,21 @@
 import { chromium, Browser, BrowserContext, Page } from "playwright";
 
-export interface BrowsercatOptions {
+export interface BrowserOptions {
   apiKey: string;
   local?: boolean;
   headed?: boolean;
 }
 
-export class BrowsercatClient {
+export class BrowserClient {
   private readonly apiKey: string;
-  private readonly url: string;
   private readonly local: boolean;
   private readonly headed: boolean;
   private browser?: Browser;
   private context?: BrowserContext;
   private page?: Page;
 
-  constructor(options: BrowsercatOptions) {
+  constructor(options: BrowserOptions) {
     this.apiKey = options.apiKey;
-    this.url = "wss://api.browsercat.com/connect";
     this.local = options.local ?? false;
     this.headed = options.headed ?? false;
   }
@@ -30,18 +28,18 @@ export class BrowsercatClient {
         slowMo: this.headed ? 100 : 0, // Slow down actions in headed mode
       });
     } else {
-      // Browsercat for production
+      // Browsercat for production (legacy - now using Lambda)
+      const url = "wss://api.browsercat.com/connect";
       try {
         // Add timeout to prevent hanging
         this.browser = await Promise.race([
-          chromium.connect(this.url, {
+          chromium.connect(url, {
             headers: { "Api-Key": this.apiKey },
             timeout: 60000, // 60 second timeout
           }),
           new Promise<never>((_, reject) =>
             setTimeout(
-              () =>
-                reject(new Error("Browsercat connection timeout after 60s")),
+              () => reject(new Error("Browsercat connection timeout after 60s")),
               60000
             )
           ),
@@ -70,3 +68,4 @@ export class BrowsercatClient {
     }
   }
 }
+
